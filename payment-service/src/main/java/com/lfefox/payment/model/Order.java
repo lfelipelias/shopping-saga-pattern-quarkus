@@ -1,9 +1,15 @@
-package com.lfefox.model;
+package com.lfefox.payment.model;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 
+/**
+ * Felipe.Elias
+ */
 @Getter
 @Setter
 @ToString

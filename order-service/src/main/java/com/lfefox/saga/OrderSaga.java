@@ -4,21 +4,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lfefox.model.Order;
 import com.lfefox.service.OrderService;
 import io.smallrye.reactive.messaging.kafka.Record;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.jboss.logging.Logger;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+@Slf4j
 @ApplicationScoped
+@RequiredArgsConstructor
 public class OrderSaga {
 
-    @Inject
-    private Logger logger;
-    @Inject
-    private OrderService orderService;
+
+    private final OrderService orderService;
 
     @Inject
     @Channel("product-out")
@@ -27,7 +28,7 @@ public class OrderSaga {
 
     @SneakyThrows
     public Order saveOrder(Order order){
-        logger.infof("BEGIN SAGA :{}", order);
+        log.info("BEGIN SAGA :{}", order);
 
         order = orderService.saveOrder(order);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -37,9 +38,9 @@ public class OrderSaga {
         emitter.send(Record.of(order.getId(), seatJson))
                 .whenComplete((success, failure) -> {
                     if (failure != null) {
-                        logger.error("D'oh! " + failure.getMessage());
+                        log.error("D'oh! " + failure.getMessage());
                     } else {
-                        logger.info("Message processed successfully");
+                        log.info("Message processed successfully");
                     }
                 });
 
