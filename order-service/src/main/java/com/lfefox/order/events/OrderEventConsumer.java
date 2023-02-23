@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
-
 import javax.enterprise.context.ApplicationScoped;
 
 /**
@@ -27,15 +26,11 @@ public class OrderEventConsumer {
     @Incoming("order-in")
     public void receive(Record<Long, String> record) {
 
-
-
-
-
         ObjectMapper objectMapper = new ObjectMapper();
 
         final Order order = objectMapper.readValue(record.value(), Order.class);
 
-        log.info("receiving event of type: {}", order.getTransactionEventType());
+        log.info("receiving event for order: {}", order);
         if (TransactionEventTypeEnum.COMPENSATION == order.getTransactionEventType()) {
 
             cancelOrderUseCase.cancelOrder(order);

@@ -32,10 +32,10 @@ public class NewOrderUseCase {
 
         order = orderService.saveOrder(order);
 
-
-
         ObjectMapper objectMapper = new ObjectMapper();
         final String jsonToSend = objectMapper.writeValueAsString(order);
+
+        log.info("sendPaymentEvent for order: {}", order);
 
         emitter.send(Record.of(order.getOrderId(), jsonToSend))
                 .whenComplete((success, failure) -> {
@@ -46,6 +46,7 @@ public class NewOrderUseCase {
                     }
                 });
 
+        log.info("END USECASE NEW ORDER");
         return order;
     }
 }

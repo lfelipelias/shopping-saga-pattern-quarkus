@@ -21,7 +21,7 @@ public class PaymentEventConsumer {
     private final PaymentUseCase paymentUseCase;
 
     @SneakyThrows
-    @Incoming("payments-in")
+    @Incoming("payment-in")
     public void receive(Record<Long, String> record) {
 
 

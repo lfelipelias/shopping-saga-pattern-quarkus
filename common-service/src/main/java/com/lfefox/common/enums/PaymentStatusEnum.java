@@ -4,7 +4,7 @@ package com.lfefox.common.enums;
  */
 public enum PaymentStatusEnum {
 
-    IN_PROGRESS(1L), PAID(2L), ERROR_PROCESSING_PAYMENT(3L);
+    IN_PROGRESS(1L), PAID(2L), ERROR_PROCESSING_PAYMENT(3L), REFUND_DUE_COMPENSATION(4L);
     private final Long id;
 
     public Long getId(){ return id; }

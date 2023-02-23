@@ -39,7 +39,7 @@ public class PaymentUseCase {
 
         try {
             //SIMULATING EXTERNAL CALL TO PERFORM PAYMENT
-            paymentService.makePaymentExternalCall(payment, Boolean.TRUE);
+            paymentService.makePaymentExternalCall(payment, order.getShouldFail());
         } catch (Exception e) {
 
             //SAVING PAYMENT ERROR
@@ -54,15 +54,18 @@ public class PaymentUseCase {
             order.setStatusId(OrderStatusEnum.ERROR_PAYMENT.getId());
             orderEventProducer.sendOrderEvent(order);
 
+            log.info("END USECASE NEW PAYMENT FOR ORDER: {}", order);
             return payment;
         }
 
+        log.info("PAYMENT SUCCESSFUL");
         //SAVE PAYMENT PAID
         payment.setStatus(PaymentStatusEnum.PAID.name());
         payment.setStatusId(PaymentStatusEnum.PAID.getId());
+
         paymentEventProducer.sendPaymentEvent(payment);
 
+        log.info("END USECASE NEW PAYMENT FOR ORDER: {}", order);
         return payment;
-
     }
 }

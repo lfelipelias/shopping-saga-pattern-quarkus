@@ -21,7 +21,7 @@ public class OrderService {
     public Order saveOrder(Order order){
         log.info("save order in DB: {}", order);
         //TODO PERSIST ORDER DATABASE
-        order.setStatusId(1L);
+        order.setOrderId(1L);
         order.setOrderUuid(UUID.randomUUID().toString());
         order.setStatus(OrderStatusEnum.IN_PROGRESS.name());
         order.setStatusId(OrderStatusEnum.IN_PROGRESS.getId());

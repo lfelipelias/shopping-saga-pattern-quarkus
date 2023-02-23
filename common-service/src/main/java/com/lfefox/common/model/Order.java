@@ -19,5 +19,6 @@ public class Order {
     private String status;
     private Long  statusId;
     private TransactionEventTypeEnum transactionEventType;
+    private Boolean shouldFail = Boolean.FALSE;
 
 }
