@@ -1,18 +1,16 @@
 package com.lfefox.common.model;
 
-import lombok.Getter;
+
+
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.util.Date;
 
 /**
  * Felipe.Elias
  */
-@Getter
-@Setter
-@ToString
+@Data
 @NoArgsConstructor
 public class Payment {
 

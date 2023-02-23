@@ -37,7 +37,7 @@ public class NewOrderUseCase {
         ObjectMapper objectMapper = new ObjectMapper();
         final String jsonToSend = objectMapper.writeValueAsString(order);
 
-        emitter.send(Record.of(order.getId(), jsonToSend))
+        emitter.send(Record.of(order.getOrderId(), jsonToSend))
                 .whenComplete((success, failure) -> {
                     if (failure != null) {
                         log.error("Error sending message to payment-service on channel {} error: {} ", "payment-out", failure.getMessage());

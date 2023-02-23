@@ -1,17 +1,19 @@
 package com.lfefox.common.model;
 
 import com.lfefox.common.enums.TransactionEventTypeEnum;
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-@Getter
-@Setter
-@ToString
+/**
+ * Felipe.Elias
+ */
+@Data
 @NoArgsConstructor
 public class Order {
 
-    private Long id;
+    private Long orderId;
     private String orderUuid;
     private BigDecimal price;
     private String status;

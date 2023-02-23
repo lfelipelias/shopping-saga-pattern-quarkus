@@ -44,7 +44,7 @@ public class PaymentEventProducer {
 
                         final Order order = new Order();
 
-                        order.setId(payment.getOrderId());
+                        order.setOrderId(payment.getOrderId());
                         order.setStatus(OrderStatusEnum.ERROR_PAYMENT.name());
                         order.setStatusId(OrderStatusEnum.ERROR_PAYMENT.getId());
                         order.setTransactionEventType(TransactionEventTypeEnum.COMPENSATION);

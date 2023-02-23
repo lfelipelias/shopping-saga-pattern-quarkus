@@ -34,7 +34,7 @@ public class PaymentUseCase {
         Payment payment = new Payment();
         payment.setStatus(PaymentStatusEnum.IN_PROGRESS.name());
         payment.setStatusId(PaymentStatusEnum.IN_PROGRESS.getId());
-        payment.setOrderId(order.getId());
+        payment.setOrderId(order.getOrderId());
         payment = paymentService.savePayment(payment);
 
         try {

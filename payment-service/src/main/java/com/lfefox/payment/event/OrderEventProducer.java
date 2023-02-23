@@ -32,7 +32,7 @@ public class OrderEventProducer {
 
         final String jsonToSend = objectMapper.writeValueAsString(order);
 
-        emitter.send(Record.of(order.getId(), jsonToSend))
+        emitter.send(Record.of(order.getOrderId(), jsonToSend))
                 .whenComplete((success, failure) -> {
                     if (failure != null) {
                         log.error("Error sending message to payment-service on channel {} error: {} ", "order-out", failure.getMessage());
