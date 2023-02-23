@@ -1,6 +1,6 @@
 package com.lfefox.order.usecase;
 
-import com.lfefox.order.model.Order;
+import com.lfefox.common.model.Order;
 import com.lfefox.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;

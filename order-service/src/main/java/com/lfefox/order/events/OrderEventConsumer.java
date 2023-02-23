@@ -1,7 +1,8 @@
 package com.lfefox.order.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lfefox.order.model.Order;
+import com.lfefox.common.enums.TransactionEventTypeEnum;
+import com.lfefox.common.model.Order;
 import com.lfefox.order.service.OrderService;
 import com.lfefox.order.usecase.CancelOrderUseCase;
 import io.smallrye.reactive.messaging.kafka.Record;
@@ -26,17 +27,20 @@ public class OrderEventConsumer {
     @Incoming("order-in")
     public void receive(Record<Long, String> record) {
 
-        log.info("record es: {}", record.key());
+
+
+
 
         ObjectMapper objectMapper = new ObjectMapper();
 
         final Order order = objectMapper.readValue(record.value(), Order.class);
 
-        if (null != order.getType() && order.getType().equalsIgnoreCase("compensation")) {
+        log.info("receiving event of type: {}", order.getTransactionEventType());
+        if (TransactionEventTypeEnum.COMPENSATION == order.getTransactionEventType()) {
 
             cancelOrderUseCase.cancelOrder(order);
 
-        } else {
+        }  if (TransactionEventTypeEnum.COMPLETE_ORDER == order.getTransactionEventType()) {
             //SUCESS FINISH ORDER
             orderService.updateOrder(order);
 

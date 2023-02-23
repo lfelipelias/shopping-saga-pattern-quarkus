@@ -1,6 +1,6 @@
 package com.lfefox.order.resource;
 
-import com.lfefox.order.model.Order;
+import com.lfefox.common.model.Order;
 import com.lfefox.order.usecase.NewOrderUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

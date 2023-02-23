@@ -1,8 +1,7 @@
-package com.lfefox.order.usecase;
+package com.lfefox.payment.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lfefox.common.model.Order;
-import com.lfefox.order.service.OrderService;
 import io.smallrye.reactive.messaging.kafka.Record;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -13,39 +12,33 @@ import org.eclipse.microprofile.reactive.messaging.Emitter;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+/**
+ * Felipe.Elias
+ */
 @Slf4j
 @ApplicationScoped
 @RequiredArgsConstructor
-public class NewOrderUseCase {
-
-
-    private final OrderService orderService;
+public class OrderEventProducer {
 
     @Inject
-    @Channel("payment-out")
-    private Emitter<Record<Long, String>> emitter;
-
+    @Channel("order-out")
+    Emitter<Record<Long, String>> emitter;
 
     @SneakyThrows
-    public Order saveOrder(Order order){
-        log.info("BEGIN USECASE NEW ORDER: {}", order);
-
-        order = orderService.saveOrder(order);
-
-
+    public void sendOrderEvent(Order order) {
+        log.info("sendOrderEvent: {}" , order);
 
         ObjectMapper objectMapper = new ObjectMapper();
+
         final String jsonToSend = objectMapper.writeValueAsString(order);
 
         emitter.send(Record.of(order.getId(), jsonToSend))
                 .whenComplete((success, failure) -> {
                     if (failure != null) {
-                        log.error("Error sending message to payment-service on channel {} error: {} ", "payment-out", failure.getMessage());
+                        log.error("Error sending message to payment-service on channel {} error: {} ", "order-out", failure.getMessage());
                     } else {
-                        log.info("Message for payment-service sent successfully on channel: {}", "payment-out");
+                        log.info("Message for payment-service sent successfully on channel: {}", "order-out");
                     }
                 });
-
-        return order;
     }
 }
