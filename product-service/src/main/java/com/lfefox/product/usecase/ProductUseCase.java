@@ -36,9 +36,6 @@ public class ProductUseCase {
             //SAVING PAYMENT ERROR
             log.info("EXCEPTION DURING PROCESSING PRODUCTS, STARTING PAYMENT COMPENSATION");
 
-
-
-
             //SENDING COMPENSATION TO ORDER SERVICE
             Payment payment = new Payment();
             payment.setOrderId(order.getOrderId());

@@ -25,7 +25,7 @@ public class CancelPaymentUseCase {
 
     public void cancelPayment(Payment payment) {
 
-        log.info("COMPENSATION FOR PAYMENT: {}", payment);
+        log.info("BEGIN COMPENSATION FOR PAYMENT: {}", payment);
 
         payment = paymentService.compensatePayment(payment);
 
@@ -38,6 +38,6 @@ public class CancelPaymentUseCase {
         log.info("SENDING COMPENSATE ORDER EVENT: {}", order);
         orderEventProducer.sendOrderEvent(order);
 
-        log.info("END FOR PAYMENT: {}", payment);
+        log.info("END COMPENSATION FOR PAYMENT: {}", payment);
     }
 }

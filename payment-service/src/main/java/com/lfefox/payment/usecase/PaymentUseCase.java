@@ -50,8 +50,6 @@ public class PaymentUseCase {
 
             //SENDING COMPENSATION TO ORDER SERVICE
             order.setTransactionEventType(TransactionEventTypeEnum.COMPENSATION);
-            order.setStatus(OrderStatusEnum.ERROR_PAYMENT.name());
-            order.setStatusId(OrderStatusEnum.ERROR_PAYMENT.getId());
             orderEventProducer.sendOrderEvent(order);
 
             log.info("END USECASE NEW PAYMENT FOR ORDER: {}", order);

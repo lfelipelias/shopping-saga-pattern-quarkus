@@ -24,19 +24,17 @@ public class ProductService {
     public void processOrder(Order order){
         log.info("processOrder: {}", order);
 
-        throw new RuntimeException("TESTING PRODUCT COMPESATION FLOW");
+        final List<Product> listProducts = listProducts(order);
+        log.info("found list of products for order: {}", listProducts);
 
-//        final List<Product> listProducts = listProducts(order);
-//        log.info("found list of products for order: {}", listProducts);
-//
-//        listProducts.stream().forEach(product -> {
-//            product.setStatusId(ProductStatusEnum.SOLD.getId());
-//            product.setStatus(ProductStatusEnum.SOLD.name());
-//        });
-//
-//        log.info("setting status of products to : {}", ProductStatusEnum.SOLD.name());
-//
-//        saveProducts(listProducts);
+        listProducts.stream().forEach(product -> {
+            product.setStatusId(ProductStatusEnum.SOLD.getId());
+            product.setStatus(ProductStatusEnum.SOLD.name());
+        });
+
+        log.info("setting status of products to : {}", ProductStatusEnum.SOLD.name());
+
+        saveProducts(listProducts);
         
     }
 

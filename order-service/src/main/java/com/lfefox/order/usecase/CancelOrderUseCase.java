@@ -17,8 +17,9 @@ public class CancelOrderUseCase {
 
     @SneakyThrows
     public void cancelOrder(Order order){
-        log.info("BEGINNING USECASE CANCEL ORDER: {}", order);
+        log.info("BEGIN COMPENSATION FOR ORDER: {}", order);
         orderService.cancelOrder(order);
+        log.info("END COMPENSATION FOR ORDER: {}", order);
 
     }
 }

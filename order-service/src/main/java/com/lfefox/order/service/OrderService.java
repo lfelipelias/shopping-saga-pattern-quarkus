@@ -30,14 +30,14 @@ public class OrderService {
 
     @Transactional
     public Order cancelOrder(Order order){
-        log.info("cancel order in DB: {}", order);
+        log.info("cancelOrder in DB: {}", order);
 
         return order;
     }
 
     @Transactional
     public Order updateOrder(Order order){
-        log.info("update order in DB: {}", order);
+        log.info("updateOrder in DB: {}", order);
 
         return order;
     }
