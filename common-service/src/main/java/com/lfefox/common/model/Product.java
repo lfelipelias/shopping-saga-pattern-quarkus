@@ -1,23 +1,19 @@
 package com.lfefox.common.model;
 
-
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
 
 /**
  * Felipe.Elias
  */
 @Data
 @NoArgsConstructor
-public class Payment {
+public class Product {
 
-    private Long paymentId;
-    private Long orderId;
-    private Date createDate;
+    private Long productId;
+    private String name;
     private String status;
     private Long  statusId;
+    private Long orderId;
 
 }

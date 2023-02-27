@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * Felipe.Elias
@@ -15,6 +16,7 @@ public class Order {
 
     private Long orderId;
     private String orderUuid;
+    private Date createDate;
     private BigDecimal price;
     private String status;
     private Long  statusId;

@@ -6,7 +6,7 @@ import com.lfefox.common.enums.TransactionEventTypeEnum;
 import com.lfefox.common.model.Order;
 import com.lfefox.common.model.Payment;
 import com.lfefox.payment.event.OrderEventProducer;
-import com.lfefox.payment.event.PaymentEventProducer;
+import com.lfefox.payment.event.ProductEventProducer;
 import com.lfefox.payment.service.PaymentService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import javax.enterprise.context.ApplicationScoped;
 public class PaymentUseCase {
 
     private final PaymentService paymentService;
-    private final PaymentEventProducer paymentEventProducer;
+    private final ProductEventProducer productEventProducer;
     private final OrderEventProducer orderEventProducer;
 
 
@@ -63,7 +63,9 @@ public class PaymentUseCase {
         payment.setStatus(PaymentStatusEnum.PAID.name());
         payment.setStatusId(PaymentStatusEnum.PAID.getId());
 
-        paymentEventProducer.sendPaymentEvent(payment);
+        payment = paymentService.savePayment(payment);
+
+        productEventProducer.sendProductEvent(payment);
 
         log.info("END USECASE NEW PAYMENT FOR ORDER: {}", order);
         return payment;

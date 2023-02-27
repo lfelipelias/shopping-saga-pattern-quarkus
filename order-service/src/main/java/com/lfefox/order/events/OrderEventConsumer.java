@@ -35,7 +35,7 @@ public class OrderEventConsumer {
 
             cancelOrderUseCase.cancelOrder(order);
 
-        }  if (TransactionEventTypeEnum.COMPLETE_ORDER == order.getTransactionEventType()) {
+        } else if (TransactionEventTypeEnum.COMPLETE_ORDER == order.getTransactionEventType()) {
             //SUCESS FINISH ORDER
             orderService.updateOrder(order);
 

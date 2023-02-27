@@ -21,30 +21,31 @@ import javax.enterprise.context.ApplicationScoped;
 @Slf4j
 @ApplicationScoped
 @RequiredArgsConstructor
-public class PaymentEventProducer {
+public class ProductEventProducer {
 
-    @Channel("payment-out")
+    @Channel("product-out")
     Emitter<Record<Long, String>> emitter;
 
     private final OrderEventProducer orderEventProducer;
     private final PaymentService paymentService;
 
     @SneakyThrows
-    public void sendPaymentEvent(Payment payment) {
+    public void sendProductEvent(Payment payment) {
         log.info("sendPaymentEvent for payment: {}", payment);
+
+        final Order order = new Order();
+        order.setOrderId(payment.getOrderId());
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        var paymentJson = objectMapper.writeValueAsString(payment);
+        var paymentJson = objectMapper.writeValueAsString(order);
 
         emitter.send(Record.of(payment.getPaymentId(), paymentJson))
                 .whenComplete((success, failure) -> {
                     if (failure != null) {
                         log.error("Error sending message to product-service on channel {} error: {} ", "payment-out", failure.getMessage());
 
-                        final Order order = new Order();
 
-                        order.setOrderId(payment.getOrderId());
                         order.setStatus(OrderStatusEnum.ERROR_PAYMENT.name());
                         order.setStatusId(OrderStatusEnum.ERROR_PAYMENT.getId());
                         order.setTransactionEventType(TransactionEventTypeEnum.COMPENSATION);
