@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Felipe.Elias
@@ -17,10 +18,12 @@ public class Order {
     private Long orderId;
     private String orderUuid;
     private Date createDate;
-    private BigDecimal price;
+    private BigDecimal totalOrder;
     private String status;
     private Long  statusId;
     private TransactionEventTypeEnum transactionEventType;
     private Boolean shouldFail = Boolean.FALSE;
+
+    private List<OrderProductModel> orderProductModels;
 
 }
