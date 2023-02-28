@@ -1,4 +1,4 @@
-package com.lfefox.common.model;
+package com.lfefox.common.resource;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class OrderProductModel {
-    private Order order;
-    private Product product;
+    private OrderResource order;
+    private ProductModel product;
 }

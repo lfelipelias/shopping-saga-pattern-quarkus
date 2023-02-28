@@ -1,7 +1,7 @@
 package com.lfefox.order.usecase;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lfefox.common.model.Order;
+import com.lfefox.common.resource.OrderResource;
 import com.lfefox.order.service.OrderService;
 import io.smallrye.reactive.messaging.kafka.Record;
 import lombok.RequiredArgsConstructor;
@@ -27,17 +27,17 @@ public class NewOrderUseCase {
 
 
     @SneakyThrows
-    public Order saveOrder(Order order){
-        log.info("BEGIN USECASE NEW ORDER: {}", order);
+    public OrderResource saveOrder(OrderResource orderResource){
+        log.info("BEGIN USECASE NEW ORDER: {}", orderResource);
 
-        order = orderService.saveOrder(order);
+        orderResource = orderService.saveOrder(orderResource);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        final String jsonToSend = objectMapper.writeValueAsString(order);
+        final String jsonToSend = objectMapper.writeValueAsString(orderResource);
 
-        log.info("sendPaymentEvent for order: {}", order);
+        log.info("sendPaymentEvent for order: {}", orderResource);
 
-        emitter.send(Record.of(order.getOrderId(), jsonToSend))
+        emitter.send(Record.of(orderResource.getOrderId(), jsonToSend))
                 .whenComplete((success, failure) -> {
                     if (failure != null) {
                         log.error("Error sending message to payment-service on channel {} error: {} ", "payment-out", failure.getMessage());
@@ -47,6 +47,6 @@ public class NewOrderUseCase {
                 });
 
         log.info("END USECASE NEW ORDER");
-        return order;
+        return orderResource;
     }
 }

@@ -1,7 +1,7 @@
 package com.lfefox.product.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lfefox.common.model.Order;
+import com.lfefox.common.resource.OrderResource;
 import com.lfefox.product.usecase.ProductUseCase;
 import io.smallrye.reactive.messaging.kafka.Record;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +26,11 @@ public class ProductEventConsumer {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        final Order order = objectMapper.readValue(record.value(), Order.class);
+        final OrderResource orderResource = objectMapper.readValue(record.value(), OrderResource.class);
 
         log.info("receiving event of new order");
 
-        productUseCase.processProducts(order);
+        productUseCase.processProducts(orderResource);
 
     }
 

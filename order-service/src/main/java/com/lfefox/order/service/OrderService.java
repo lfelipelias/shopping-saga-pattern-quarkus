@@ -2,7 +2,7 @@ package com.lfefox.order.service;
 
 
 import com.lfefox.common.enums.OrderStatusEnum;
-import com.lfefox.common.model.Order;
+import com.lfefox.common.resource.OrderResource;
 import com.lfefox.order.entity.OrderInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ import java.util.UUID;
 public class OrderService {
 
     @Transactional
-    public Order saveOrder(Order order){
+    public OrderResource saveOrder(OrderResource orderResource){
 
         OrderInfo orderInfo = new OrderInfo();
         orderInfo.setUserId(2L);
@@ -33,26 +33,26 @@ public class OrderService {
 
         List<OrderInfo> orders = orderInfo.findAll().list();
 
-        log.info("save order in DB: {}", order);
+        log.info("save order in DB: {}", orderResource);
         //TODO PERSIST ORDER DATABASE
-        order.setOrderId(1L);
-        order.setOrderUuid(UUID.randomUUID().toString());
-        order.setStatus(OrderStatusEnum.IN_PROGRESS.name());
-        order.setStatusId(OrderStatusEnum.IN_PROGRESS.getId());
-        return order;
+        orderResource.setOrderId(1L);
+        orderResource.setOrderUuid(UUID.randomUUID().toString());
+        orderResource.setStatus(OrderStatusEnum.IN_PROGRESS.name());
+        orderResource.setStatusId(OrderStatusEnum.IN_PROGRESS.getId());
+        return orderResource;
     }
 
     @Transactional
-    public Order cancelOrder(Order order){
-        log.info("cancelOrder in DB: {}", order);
+    public OrderResource cancelOrder(OrderResource orderResource){
+        log.info("cancelOrder in DB: {}", orderResource);
 
-        return order;
+        return orderResource;
     }
 
     @Transactional
-    public Order updateOrder(Order order){
-        log.info("updateOrder in DB: {}", order);
+    public OrderResource updateOrder(OrderResource orderResource){
+        log.info("updateOrder in DB: {}", orderResource);
 
-        return order;
+        return orderResource;
     }
 }

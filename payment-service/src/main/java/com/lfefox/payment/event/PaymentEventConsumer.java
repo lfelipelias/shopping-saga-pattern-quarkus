@@ -1,7 +1,7 @@
 package com.lfefox.payment.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lfefox.common.model.Order;
+import com.lfefox.common.resource.OrderResource;
 import com.lfefox.payment.usecase.PaymentUseCase;
 import io.smallrye.reactive.messaging.kafka.Record;
 import lombok.RequiredArgsConstructor;
@@ -28,11 +28,11 @@ public class PaymentEventConsumer {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        final Order order = objectMapper.readValue(record.value(), Order.class);
+        final OrderResource orderResource = objectMapper.readValue(record.value(), OrderResource.class);
 
         log.info("receiving event of new order");
 
-        paymentUseCase.makePayment(order);
+        paymentUseCase.makePayment(orderResource);
 
     }
 }

@@ -2,8 +2,8 @@ package com.lfefox.payment.usecase;
 
 import com.lfefox.common.enums.OrderStatusEnum;
 import com.lfefox.common.enums.TransactionEventTypeEnum;
-import com.lfefox.common.model.Order;
-import com.lfefox.common.model.Payment;
+import com.lfefox.common.resource.OrderResource;
+import com.lfefox.common.resource.PaymentResource;
 import com.lfefox.payment.event.OrderEventProducer;
 import com.lfefox.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
@@ -23,21 +23,21 @@ public class CancelPaymentUseCase {
     private final OrderEventProducer orderEventProducer;
 
 
-    public void cancelPayment(Payment payment) {
+    public void cancelPayment(PaymentResource paymentResource) {
 
-        log.info("BEGIN COMPENSATION FOR PAYMENT: {}", payment);
+        log.info("BEGIN COMPENSATION FOR PAYMENT: {}", paymentResource);
 
-        payment = paymentService.compensatePayment(payment);
+        paymentResource = paymentService.compensatePayment(paymentResource);
 
-        final Order order = new Order();
-        order.setOrderId(payment.getOrderId());
-        order.setStatus(OrderStatusEnum.ERROR_PAYMENT.name());
-        order.setStatusId(OrderStatusEnum.ERROR_PAYMENT.getId());
-        order.setTransactionEventType(TransactionEventTypeEnum.COMPENSATION);
+        final OrderResource orderResource = new OrderResource();
+        orderResource.setOrderId(paymentResource.getOrderId());
+        orderResource.setStatus(OrderStatusEnum.ERROR_PAYMENT.name());
+        orderResource.setStatusId(OrderStatusEnum.ERROR_PAYMENT.getId());
+        orderResource.setTransactionEventType(TransactionEventTypeEnum.COMPENSATION);
 
-        log.info("SENDING COMPENSATE ORDER EVENT: {}", order);
-        orderEventProducer.sendOrderEvent(order);
+        log.info("SENDING COMPENSATE ORDER EVENT: {}", orderResource);
+        orderEventProducer.sendOrderEvent(orderResource);
 
-        log.info("END COMPENSATION FOR PAYMENT: {}", payment);
+        log.info("END COMPENSATION FOR PAYMENT: {}", paymentResource);
     }
 }

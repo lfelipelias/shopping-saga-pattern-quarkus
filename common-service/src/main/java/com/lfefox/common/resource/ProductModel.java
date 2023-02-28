@@ -1,4 +1,4 @@
-package com.lfefox.common.model;
+package com.lfefox.common.resource;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class Product {
+public class ProductModel {
 
     private Long productId;
     private String name;

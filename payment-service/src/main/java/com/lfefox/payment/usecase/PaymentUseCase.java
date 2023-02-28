@@ -1,10 +1,9 @@
 package com.lfefox.payment.usecase;
 
-import com.lfefox.common.enums.OrderStatusEnum;
 import com.lfefox.common.enums.PaymentStatusEnum;
 import com.lfefox.common.enums.TransactionEventTypeEnum;
-import com.lfefox.common.model.Order;
-import com.lfefox.common.model.Payment;
+import com.lfefox.common.resource.OrderResource;
+import com.lfefox.common.resource.PaymentResource;
 import com.lfefox.payment.event.OrderEventProducer;
 import com.lfefox.payment.event.ProductEventProducer;
 import com.lfefox.payment.service.PaymentService;
@@ -27,45 +26,45 @@ public class PaymentUseCase {
     private final OrderEventProducer orderEventProducer;
 
 
-    public Payment makePayment(Order order){
-        log.info("BEGIN USECASE NEW PAYMENT FOR ORDER: {}", order);
+    public PaymentResource makePayment(OrderResource orderResource){
+        log.info("BEGIN USECASE NEW PAYMENT FOR ORDER: {}", orderResource);
 
         //SAVE NEW PAYMENT
-        Payment payment = new Payment();
-        payment.setStatus(PaymentStatusEnum.IN_PROGRESS.name());
-        payment.setStatusId(PaymentStatusEnum.IN_PROGRESS.getId());
-        payment.setOrderId(order.getOrderId());
-        payment = paymentService.savePayment(payment);
+        PaymentResource paymentResource = new PaymentResource();
+        paymentResource.setStatus(PaymentStatusEnum.IN_PROGRESS.name());
+        paymentResource.setStatusId(PaymentStatusEnum.IN_PROGRESS.getId());
+        paymentResource.setOrderId(orderResource.getOrderId());
+        paymentResource = paymentService.savePayment(paymentResource);
 
         try {
             //SIMULATING EXTERNAL CALL TO PERFORM PAYMENT
-            paymentService.makePaymentExternalCall(payment, order.getShouldFail());
+            paymentService.makePaymentExternalCall(paymentResource, orderResource.getShouldFail());
         } catch (Exception e) {
 
             //SAVING PAYMENT ERROR
             log.info("EXCEPTION DURING EXTERNAL PAYMENT, UPDATING PAYMENT AND STARTING ORDER COMPENSATION");
-            payment.setStatus(PaymentStatusEnum.ERROR_PROCESSING_PAYMENT.name());
-            payment.setStatusId(PaymentStatusEnum.ERROR_PROCESSING_PAYMENT.getId());
-            payment = paymentService.savePayment(payment);
+            paymentResource.setStatus(PaymentStatusEnum.ERROR_PROCESSING_PAYMENT.name());
+            paymentResource.setStatusId(PaymentStatusEnum.ERROR_PROCESSING_PAYMENT.getId());
+            paymentResource = paymentService.savePayment(paymentResource);
 
             //SENDING COMPENSATION TO ORDER SERVICE
-            order.setTransactionEventType(TransactionEventTypeEnum.COMPENSATION);
-            orderEventProducer.sendOrderEvent(order);
+            orderResource.setTransactionEventType(TransactionEventTypeEnum.COMPENSATION);
+            orderEventProducer.sendOrderEvent(orderResource);
 
-            log.info("END USECASE NEW PAYMENT FOR ORDER: {}", order);
-            return payment;
+            log.info("END USECASE NEW PAYMENT FOR ORDER: {}", orderResource);
+            return paymentResource;
         }
 
         log.info("PAYMENT SUCCESSFUL");
         //SAVE PAYMENT PAID
-        payment.setStatus(PaymentStatusEnum.PAID.name());
-        payment.setStatusId(PaymentStatusEnum.PAID.getId());
+        paymentResource.setStatus(PaymentStatusEnum.PAID.name());
+        paymentResource.setStatusId(PaymentStatusEnum.PAID.getId());
 
-        payment = paymentService.savePayment(payment);
+        paymentResource = paymentService.savePayment(paymentResource);
 
-        productEventProducer.sendProductEvent(payment);
+        productEventProducer.sendProductEvent(paymentResource);
 
-        log.info("END USECASE NEW PAYMENT FOR ORDER: {}", order);
-        return payment;
+        log.info("END USECASE NEW PAYMENT FOR ORDER: {}", orderResource);
+        return paymentResource;
     }
 }

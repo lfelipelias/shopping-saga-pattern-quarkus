@@ -1,4 +1,4 @@
-package com.lfefox.common.model;
+package com.lfefox.common.resource;
 
 import com.lfefox.common.enums.TransactionEventTypeEnum;
 import lombok.Data;
@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
-public class Order {
+public class OrderResource {
 
     private Long orderId;
     private String orderUuid;

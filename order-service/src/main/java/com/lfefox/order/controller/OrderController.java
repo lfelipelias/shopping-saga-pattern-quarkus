@@ -1,6 +1,6 @@
-package com.lfefox.order.resource;
+package com.lfefox.order.controller;
 
-import com.lfefox.common.model.Order;
+import com.lfefox.common.resource.OrderResource;
 import com.lfefox.order.usecase.NewOrderUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,17 +17,17 @@ import javax.ws.rs.core.UriInfo;
 @Path("/order")
 @ApplicationScoped
 @RequiredArgsConstructor
-public class OrderResource {
+public class OrderController {
 
     private final NewOrderUseCase orderSaga;
 
 
 
     @POST
-    public Response saveOrder(Order order, @Context UriInfo uriInfo) {
+    public Response saveOrder(OrderResource orderResource, @Context UriInfo uriInfo) {
 
-        order = orderSaga.saveOrder(order);
-        UriBuilder builder = uriInfo.getAbsolutePathBuilder().path(order.getOrderUuid());
+        orderResource = orderSaga.saveOrder(orderResource);
+        UriBuilder builder = uriInfo.getAbsolutePathBuilder().path(orderResource.getOrderUuid());
 
         log.info("New Order " + builder.build().toString());
         return Response.created(builder.build()).build();

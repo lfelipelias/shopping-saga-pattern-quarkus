@@ -1,7 +1,7 @@
 package com.lfefox.payment.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lfefox.common.model.Order;
+import com.lfefox.common.resource.OrderResource;
 import io.smallrye.reactive.messaging.kafka.Record;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -25,14 +25,14 @@ public class OrderEventProducer {
     Emitter<Record<Long, String>> emitter;
 
     @SneakyThrows
-    public void sendOrderEvent(Order order) {
-        log.info("sendOrderEvent: {}" , order);
+    public void sendOrderEvent(OrderResource orderResource) {
+        log.info("sendOrderEvent: {}" , orderResource);
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        final String jsonToSend = objectMapper.writeValueAsString(order);
+        final String jsonToSend = objectMapper.writeValueAsString(orderResource);
 
-        emitter.send(Record.of(order.getOrderId(), jsonToSend))
+        emitter.send(Record.of(orderResource.getOrderId(), jsonToSend))
                 .whenComplete((success, failure) -> {
                     if (failure != null) {
                         log.error("Error sending message to payment-service on channel {} error: {} ", "order-out", failure.getMessage());

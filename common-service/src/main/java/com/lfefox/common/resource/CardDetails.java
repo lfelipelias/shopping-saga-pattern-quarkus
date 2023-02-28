@@ -1,4 +1,4 @@
-package com.lfefox.common.model;
+package com.lfefox.common.resource;
 
 import lombok.Builder;
 import lombok.Getter;

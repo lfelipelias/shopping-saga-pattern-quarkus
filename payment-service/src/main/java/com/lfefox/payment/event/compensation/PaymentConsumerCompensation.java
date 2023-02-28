@@ -1,15 +1,8 @@
 package com.lfefox.payment.event.compensation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lfefox.common.enums.OrderStatusEnum;
-import com.lfefox.common.enums.PaymentStatusEnum;
-import com.lfefox.common.enums.TransactionEventTypeEnum;
-import com.lfefox.common.model.Order;
-import com.lfefox.common.model.Payment;
-import com.lfefox.payment.event.OrderEventProducer;
-import com.lfefox.payment.service.PaymentService;
+import com.lfefox.common.resource.PaymentResource;
 import com.lfefox.payment.usecase.CancelPaymentUseCase;
-import com.lfefox.payment.usecase.PaymentUseCase;
 import io.smallrye.reactive.messaging.kafka.Record;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -35,9 +28,9 @@ public class PaymentConsumerCompensation {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        Payment payment = objectMapper.readValue(record.value(), Payment.class);
+        PaymentResource paymentResource = objectMapper.readValue(record.value(), PaymentResource.class);
 
-        log.info("receiving event for payment compensation: {}", payment);
-        cancelPaymentUseCase.cancelPayment(payment);
+        log.info("receiving event for payment compensation: {}", paymentResource);
+        cancelPaymentUseCase.cancelPayment(paymentResource);
     }
 }

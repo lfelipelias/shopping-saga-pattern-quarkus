@@ -3,8 +3,8 @@ package com.lfefox.payment.event;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lfefox.common.enums.OrderStatusEnum;
 import com.lfefox.common.enums.TransactionEventTypeEnum;
-import com.lfefox.common.model.Order;
-import com.lfefox.common.model.Payment;
+import com.lfefox.common.resource.OrderResource;
+import com.lfefox.common.resource.PaymentResource;
 import com.lfefox.payment.service.PaymentService;
 import io.smallrye.reactive.messaging.kafka.Record;
 import lombok.RequiredArgsConstructor;
@@ -30,28 +30,28 @@ public class ProductEventProducer {
     private final PaymentService paymentService;
 
     @SneakyThrows
-    public void sendProductEvent(Payment payment) {
-        log.info("sendPaymentEvent for payment: {}", payment);
+    public void sendProductEvent(PaymentResource paymentResource) {
+        log.info("sendPaymentEvent for payment: {}", paymentResource);
 
-        final Order order = new Order();
-        order.setOrderId(payment.getOrderId());
+        final OrderResource orderResource = new OrderResource();
+        orderResource.setOrderId(paymentResource.getOrderId());
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        var paymentJson = objectMapper.writeValueAsString(order);
+        var paymentJson = objectMapper.writeValueAsString(orderResource);
 
-        emitter.send(Record.of(payment.getPaymentId(), paymentJson))
+        emitter.send(Record.of(paymentResource.getPaymentId(), paymentJson))
                 .whenComplete((success, failure) -> {
                     if (failure != null) {
                         log.error("Error sending message to product-service on channel {} error: {} ", "payment-out", failure.getMessage());
 
 
-                        order.setStatus(OrderStatusEnum.ERROR_PAYMENT.name());
-                        order.setStatusId(OrderStatusEnum.ERROR_PAYMENT.getId());
-                        order.setTransactionEventType(TransactionEventTypeEnum.COMPENSATION);
+                        orderResource.setStatus(OrderStatusEnum.ERROR_PAYMENT.name());
+                        orderResource.setStatusId(OrderStatusEnum.ERROR_PAYMENT.getId());
+                        orderResource.setTransactionEventType(TransactionEventTypeEnum.COMPENSATION);
 
-                        orderEventProducer.sendOrderEvent(order);
-                        paymentService.compensatePayment(payment);
+                        orderEventProducer.sendOrderEvent(orderResource);
+                        paymentService.compensatePayment(paymentResource);
 
                     } else {
 

@@ -1,10 +1,8 @@
 package com.lfefox.product.usecase;
 
-import com.lfefox.common.enums.OrderStatusEnum;
-import com.lfefox.common.enums.PaymentStatusEnum;
 import com.lfefox.common.enums.TransactionEventTypeEnum;
-import com.lfefox.common.model.Order;
-import com.lfefox.common.model.Payment;
+import com.lfefox.common.resource.OrderResource;
+import com.lfefox.common.resource.PaymentResource;
 import com.lfefox.product.event.OrderEventProducer;
 import com.lfefox.product.event.PaymentEventProducer;
 import com.lfefox.product.service.ProductService;
@@ -25,31 +23,31 @@ public class ProductUseCase {
 
     private final ProductService productService;
 
-    public void processProducts(Order order){
+    public void processProducts(OrderResource orderResource){
 
-        log.info("BEGIN USECASE PROCESS PRODUCTS FOR ORDER: {}", order);
+        log.info("BEGIN USECASE PROCESS PRODUCTS FOR ORDER: {}", orderResource);
 
         try{
-            productService.processOrder(order);
+            productService.processOrder(orderResource);
         } catch(Exception e){
 
             //SAVING PAYMENT ERROR
             log.info("EXCEPTION DURING PROCESSING PRODUCTS, STARTING PAYMENT COMPENSATION");
 
             //SENDING COMPENSATION TO ORDER SERVICE
-            Payment payment = new Payment();
-            payment.setOrderId(order.getOrderId());
+            PaymentResource paymentResource = new PaymentResource();
+            paymentResource.setOrderId(orderResource.getOrderId());
 
-            paymentEventProducer.sendPaymentEvent(payment);
+            paymentEventProducer.sendPaymentEvent(paymentResource);
 
-            log.info("END USECASE NEW PAYMENT FOR ORDER: {}", order);
+            log.info("END USECASE NEW PAYMENT FOR ORDER: {}", orderResource);
             return;
         }
 
 
 
-        order.setTransactionEventType(TransactionEventTypeEnum.COMPLETE_ORDER);
-        orderEventProducer.sendOrderEvent(order);
-        log.info("END USECASE PROCESS PRODUCTS FOR ORDER: {}", order);
+        orderResource.setTransactionEventType(TransactionEventTypeEnum.COMPLETE_ORDER);
+        orderEventProducer.sendOrderEvent(orderResource);
+        log.info("END USECASE PROCESS PRODUCTS FOR ORDER: {}", orderResource);
     }
 }

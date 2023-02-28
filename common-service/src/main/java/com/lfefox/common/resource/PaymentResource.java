@@ -1,4 +1,4 @@
-package com.lfefox.common.model;
+package com.lfefox.common.resource;
 
 
 
@@ -12,7 +12,7 @@ import java.util.Date;
  */
 @Data
 @NoArgsConstructor
-public class Payment {
+public class PaymentResource {
 
     private Long paymentId;
     private Long orderId;
