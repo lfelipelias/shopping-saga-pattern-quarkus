@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class OrderProductModel {
-    private OrderResource order;
+    private OrderInfoResource order;
     private ProductModel product;
 }

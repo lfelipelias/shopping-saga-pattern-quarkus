@@ -1,7 +1,7 @@
 package com.lfefox.payment.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lfefox.common.resource.OrderResource;
+import com.lfefox.common.resource.OrderInfoResource;
 import io.smallrye.reactive.messaging.kafka.Record;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -25,7 +25,7 @@ public class OrderEventProducer {
     Emitter<Record<Long, String>> emitter;
 
     @SneakyThrows
-    public void sendOrderEvent(OrderResource orderResource) {
+    public void sendOrderEvent(OrderInfoResource orderResource) {
         log.info("sendOrderEvent: {}" , orderResource);
 
         ObjectMapper objectMapper = new ObjectMapper();

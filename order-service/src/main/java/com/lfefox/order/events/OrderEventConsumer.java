@@ -3,7 +3,7 @@ package com.lfefox.order.events;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lfefox.common.enums.OrderStatusEnum;
 import com.lfefox.common.enums.TransactionEventTypeEnum;
-import com.lfefox.common.resource.OrderResource;
+import com.lfefox.common.resource.OrderInfoResource;
 import com.lfefox.order.service.OrderService;
 import com.lfefox.order.usecase.CancelOrderUseCase;
 import io.smallrye.reactive.messaging.kafka.Record;
@@ -31,7 +31,7 @@ public class OrderEventConsumer {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        final OrderResource orderResource = objectMapper.readValue(record.value(), OrderResource.class);
+        final OrderInfoResource orderResource = objectMapper.readValue(record.value(), OrderInfoResource.class);
 
         log.info("receiving event for order: {}", orderResource);
         if (TransactionEventTypeEnum.COMPENSATION == orderResource.getTransactionEventType()) {

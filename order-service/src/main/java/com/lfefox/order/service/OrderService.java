@@ -2,7 +2,7 @@ package com.lfefox.order.service;
 
 
 import com.lfefox.common.enums.OrderStatusEnum;
-import com.lfefox.common.resource.OrderResource;
+import com.lfefox.common.resource.OrderInfoResource;
 import com.lfefox.order.entity.OrderInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import javax.transaction.Transactional;
 public class OrderService {
 
     @Transactional
-    public OrderResource processOrder(OrderResource orderResource){
+    public OrderInfoResource processOrder(OrderInfoResource orderResource){
         log.info("processing order : {}", orderResource);
 
         OrderInfo orderInfo = OrderInfo.findById(orderResource.getOrderId());
@@ -31,14 +31,14 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResource cancelOrder(OrderResource orderResource){
+    public OrderInfoResource cancelOrder(OrderInfoResource orderResource){
         log.info("cancelOrder in DB: {}", orderResource);
 
         return orderResource;
     }
 
     @Transactional
-    public OrderResource updateOrder(OrderResource orderResource){
+    public OrderInfoResource updateOrder(OrderInfoResource orderResource){
         log.info("updateOrder in DB: {}", orderResource);
 
         return orderResource;

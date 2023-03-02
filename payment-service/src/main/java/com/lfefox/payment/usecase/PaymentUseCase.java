@@ -2,7 +2,7 @@ package com.lfefox.payment.usecase;
 
 import com.lfefox.common.enums.PaymentStatusEnum;
 import com.lfefox.common.enums.TransactionEventTypeEnum;
-import com.lfefox.common.resource.OrderResource;
+import com.lfefox.common.resource.OrderInfoResource;
 import com.lfefox.common.resource.PaymentResource;
 import com.lfefox.payment.event.OrderEventProducer;
 import com.lfefox.payment.event.ProductEventProducer;
@@ -26,7 +26,7 @@ public class PaymentUseCase {
     private final OrderEventProducer orderEventProducer;
 
 
-    public PaymentResource makePayment(OrderResource orderResource){
+    public PaymentResource makePayment(OrderInfoResource orderResource){
         log.info("BEGIN USECASE NEW PAYMENT FOR ORDER: {}", orderResource);
 
         //SAVE NEW PAYMENT

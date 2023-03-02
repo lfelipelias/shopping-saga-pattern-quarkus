@@ -1,6 +1,6 @@
 package com.lfefox.order.usecase;
 
-import com.lfefox.common.resource.OrderResource;
+import com.lfefox.common.resource.OrderInfoResource;
 import com.lfefox.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -16,7 +16,7 @@ public class CancelOrderUseCase {
     private final OrderService orderService;
 
     @SneakyThrows
-    public void cancelOrder(OrderResource orderResource){
+    public void cancelOrder(OrderInfoResource orderResource){
         log.info("BEGIN COMPENSATION FOR ORDER: {}", orderResource);
         orderService.cancelOrder(orderResource);
         log.info("END COMPENSATION FOR ORDER: {}", orderResource);

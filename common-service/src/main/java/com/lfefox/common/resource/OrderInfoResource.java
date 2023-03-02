@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
-public class OrderResource {
+public class OrderInfoResource {
 
     private Long orderId;
     private String orderUuid;

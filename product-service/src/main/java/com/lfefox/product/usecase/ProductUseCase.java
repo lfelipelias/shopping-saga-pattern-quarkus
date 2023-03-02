@@ -1,7 +1,7 @@
 package com.lfefox.product.usecase;
 
 import com.lfefox.common.enums.TransactionEventTypeEnum;
-import com.lfefox.common.resource.OrderResource;
+import com.lfefox.common.resource.OrderInfoResource;
 import com.lfefox.common.resource.PaymentResource;
 import com.lfefox.product.event.OrderEventProducer;
 import com.lfefox.product.event.PaymentEventProducer;
@@ -23,7 +23,7 @@ public class ProductUseCase {
 
     private final ProductService productService;
 
-    public void processProducts(OrderResource orderResource){
+    public void processProducts(OrderInfoResource orderResource){
 
         log.info("BEGIN USECASE PROCESS PRODUCTS FOR ORDER: {}", orderResource);
 

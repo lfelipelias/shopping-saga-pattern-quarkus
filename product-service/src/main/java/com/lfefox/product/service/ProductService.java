@@ -2,7 +2,7 @@ package com.lfefox.product.service;
 
 
 import com.lfefox.common.enums.ProductStatusEnum;
-import com.lfefox.common.resource.OrderResource;
+import com.lfefox.common.resource.OrderInfoResource;
 import com.lfefox.common.resource.ProductModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ import java.util.List;
 public class ProductService {
 
     @Transactional
-    public void processOrder(OrderResource orderResource){
+    public void processOrder(OrderInfoResource orderResource){
         log.info("processOrder: {}", orderResource);
 
         final List<ProductModel> listProductModels = listProducts(orderResource);
@@ -39,7 +39,7 @@ public class ProductService {
     }
 
     @Transactional
-    public List<ProductModel> listProducts(OrderResource orderResource){
+    public List<ProductModel> listProducts(OrderInfoResource orderResource){
         log.info("listingProducts for orderId: {} with productStatus: {} ", orderResource.getOrderId(), ProductStatusEnum.SELL_IN_PROGRESS.name());
 
         ProductModel productOne = new ProductModel();

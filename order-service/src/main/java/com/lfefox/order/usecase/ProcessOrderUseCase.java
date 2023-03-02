@@ -1,7 +1,7 @@
 package com.lfefox.order.usecase;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lfefox.common.resource.OrderResource;
+import com.lfefox.common.resource.OrderInfoResource;
 import com.lfefox.order.service.OrderService;
 import io.smallrye.reactive.messaging.kafka.Record;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class ProcessOrderUseCase {
 
 
     @SneakyThrows
-    public OrderResource processOrder(OrderResource orderResource){
+    public OrderInfoResource processOrder(OrderInfoResource orderResource){
         log.info("BEGIN USECASE PROCESS ORDER: {}", orderResource);
 
         orderResource = orderService.processOrder(orderResource);

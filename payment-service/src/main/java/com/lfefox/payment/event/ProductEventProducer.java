@@ -3,7 +3,7 @@ package com.lfefox.payment.event;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lfefox.common.enums.OrderStatusEnum;
 import com.lfefox.common.enums.TransactionEventTypeEnum;
-import com.lfefox.common.resource.OrderResource;
+import com.lfefox.common.resource.OrderInfoResource;
 import com.lfefox.common.resource.PaymentResource;
 import com.lfefox.payment.service.PaymentService;
 import io.smallrye.reactive.messaging.kafka.Record;
@@ -33,7 +33,7 @@ public class ProductEventProducer {
     public void sendProductEvent(PaymentResource paymentResource) {
         log.info("sendPaymentEvent for payment: {}", paymentResource);
 
-        final OrderResource orderResource = new OrderResource();
+        final OrderInfoResource orderResource = new OrderInfoResource();
         orderResource.setOrderId(paymentResource.getOrderId());
 
         ObjectMapper objectMapper = new ObjectMapper();
