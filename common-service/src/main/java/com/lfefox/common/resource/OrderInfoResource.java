@@ -16,6 +16,7 @@ import java.util.List;
 public class OrderInfoResource {
 
     private Long orderId;
+    private Long userId;
     private Date createDate;
     private BigDecimal totalOrder;
     private String status;
@@ -23,6 +24,6 @@ public class OrderInfoResource {
     private TransactionEventTypeEnum transactionEventType;
     private Boolean shouldFail = Boolean.FALSE;
 
-    private List<OrderProductModel> orderProductModels;
+    private List<OrderProductResource> orderProductResources;
 
 }

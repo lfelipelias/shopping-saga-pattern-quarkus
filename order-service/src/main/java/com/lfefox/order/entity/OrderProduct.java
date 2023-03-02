@@ -30,10 +30,10 @@ public class OrderProduct extends PanacheEntityBase {
     @Column(name = "price")
     private BigDecimal price;
 
+    @Column(name = "product_id")
+    private Long productId;
+
     @ManyToOne
     @JoinColumn(name = "order_id")
     private OrderInfo orderInfo;
-
-    @Column(name = "product_id")
-    private Long productId;
 }

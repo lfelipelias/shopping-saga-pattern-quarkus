@@ -3,6 +3,7 @@ package com.lfefox.order.service;
 
 import com.lfefox.common.enums.OrderStatusEnum;
 import com.lfefox.common.resource.OrderInfoResource;
+import com.lfefox.order.converter.OrderInfoConverter;
 import com.lfefox.order.entity.OrderInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,7 @@ public class OrderService {
         orderInfo.getCreateDate();
         orderInfo.persist();
 
-        return orderResource;
+        return OrderInfoConverter.toResource(orderInfo);
     }
 
     @Transactional

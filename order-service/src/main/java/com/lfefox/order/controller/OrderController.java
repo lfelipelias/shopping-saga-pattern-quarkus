@@ -12,6 +12,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import java.net.URI;
 
 /**
  * Felipe.Elias
@@ -28,10 +29,6 @@ public class OrderController {
     @POST()
     @Path("process-order")
     public Response processOrder(OrderInfoResource orderResource, @Context UriInfo uriInfo) {
-
-        orderResource = orderSaga.processOrder(orderResource);
-        UriBuilder builder = uriInfo.getAbsolutePathBuilder().path(orderResource.getOrderId().toString());
-
-        return Response.created(builder.build()).build();
+       return Response.ok(orderSaga.processOrder(orderResource)).build();
     }
 }
