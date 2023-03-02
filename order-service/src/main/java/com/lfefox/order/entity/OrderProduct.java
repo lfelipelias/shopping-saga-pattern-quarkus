@@ -1,13 +1,17 @@
 package com.lfefox.order.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
+import java.util.Date;
 
+/**
+ * Felipe.Elias
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,6 +23,12 @@ public class OrderProduct extends PanacheEntityBase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "op_id")
     private Long orderProductId;
+
+    @Column(name = "create_date")
+    private Date createDate;
+
+    @Column(name = "price")
+    private BigDecimal price;
 
     @ManyToOne
     @JoinColumn(name = "order_id")

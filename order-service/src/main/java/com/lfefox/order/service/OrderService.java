@@ -24,7 +24,7 @@ public class OrderService {
         OrderInfo orderInfo = OrderInfo.findById(orderResource.getOrderId());
         orderInfo.setStatus(OrderStatusEnum.IN_PROGRESS.name());
         orderInfo.setStatusId(OrderStatusEnum.IN_PROGRESS.getId());
-
+        orderInfo.getCreateDate();
         orderInfo.persist();
 
         return orderResource;

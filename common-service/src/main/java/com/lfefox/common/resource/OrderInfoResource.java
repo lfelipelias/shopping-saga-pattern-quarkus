@@ -16,7 +16,6 @@ import java.util.List;
 public class OrderInfoResource {
 
     private Long orderId;
-    private String orderUuid;
     private Date createDate;
     private BigDecimal totalOrder;
     private String status;

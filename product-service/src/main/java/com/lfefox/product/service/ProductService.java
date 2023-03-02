@@ -47,7 +47,7 @@ public class ProductService {
         productOne.setProductId(1L);
         productOne.setStatus(ProductStatusEnum.SELL_IN_PROGRESS.name());
         productOne.setStatusId(ProductStatusEnum.SELL_IN_PROGRESS.getId());
-        productOne.setName("MONITOR GAMER");
+        productOne.setName("GAMER MONITOR");
 
         ProductModel productTwo = new ProductModel();
         productTwo.setOrderId(1L);
