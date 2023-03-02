@@ -16,7 +16,7 @@ import javax.inject.Inject;
 @Slf4j
 @ApplicationScoped
 @RequiredArgsConstructor
-public class NewOrderUseCase {
+public class ProcessOrderUseCase {
 
 
     private final OrderService orderService;
@@ -27,10 +27,10 @@ public class NewOrderUseCase {
 
 
     @SneakyThrows
-    public OrderResource saveOrder(OrderResource orderResource){
-        log.info("BEGIN USECASE NEW ORDER: {}", orderResource);
+    public OrderResource processOrder(OrderResource orderResource){
+        log.info("BEGIN USECASE PROCESS ORDER: {}", orderResource);
 
-        orderResource = orderService.saveOrder(orderResource);
+        orderResource = orderService.processOrder(orderResource);
 
         ObjectMapper objectMapper = new ObjectMapper();
         final String jsonToSend = objectMapper.writeValueAsString(orderResource);
@@ -46,7 +46,7 @@ public class NewOrderUseCase {
                     }
                 });
 
-        log.info("END USECASE NEW ORDER");
+        log.info("END USECASE PROCESS ORDER");
         return orderResource;
     }
 }

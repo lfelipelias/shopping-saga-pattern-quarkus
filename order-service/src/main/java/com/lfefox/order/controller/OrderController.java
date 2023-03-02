@@ -1,7 +1,7 @@
 package com.lfefox.order.controller;
 
 import com.lfefox.common.resource.OrderResource;
-import com.lfefox.order.usecase.NewOrderUseCase;
+import com.lfefox.order.usecase.ProcessOrderUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,14 +19,14 @@ import javax.ws.rs.core.UriInfo;
 @RequiredArgsConstructor
 public class OrderController {
 
-    private final NewOrderUseCase orderSaga;
+    private final ProcessOrderUseCase orderSaga;
 
 
+    @POST()
+    @Path("process-order")
+    public Response processOrder(OrderResource orderResource, @Context UriInfo uriInfo) {
 
-    @POST
-    public Response saveOrder(OrderResource orderResource, @Context UriInfo uriInfo) {
-
-        orderResource = orderSaga.saveOrder(orderResource);
+        orderResource = orderSaga.processOrder(orderResource);
         UriBuilder builder = uriInfo.getAbsolutePathBuilder().path(orderResource.getOrderUuid());
 
         log.info("New Order " + builder.build().toString());
