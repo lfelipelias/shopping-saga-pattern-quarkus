@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.transaction.Transactional;
 
 /**
  * Felipe.Elias
@@ -23,6 +24,7 @@ public class CancelPaymentUseCase {
     private final OrderEventProducer orderEventProducer;
 
 
+    @Transactional
     public void cancelPayment(PaymentResource paymentResource) {
 
         log.info("BEGIN COMPENSATION FOR PAYMENT: {}", paymentResource);

@@ -9,6 +9,7 @@ import com.lfefox.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import javax.enterprise.context.ApplicationScoped;
+import javax.transaction.Transactional;
 
 /**
  * Felipe.Elias
@@ -23,6 +24,7 @@ public class ProductUseCase {
 
     private final ProductService productService;
 
+    @Transactional
     public void processProducts(OrderInfoResource orderResource){
 
         log.info("BEGIN USECASE PROCESS PRODUCTS FOR ORDER: {}", orderResource);

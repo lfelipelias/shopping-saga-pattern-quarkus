@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.transaction.Transactional;
 
 /**
  * Felipe.Elias
@@ -26,7 +27,8 @@ public class PaymentUseCase {
     private final OrderEventProducer orderEventProducer;
 
 
-    public PaymentResource makePayment(OrderInfoResource orderResource){
+    @Transactional
+    public void makePayment(OrderInfoResource orderResource){
         log.info("BEGIN USECASE NEW PAYMENT FOR ORDER: {}", orderResource);
 
         //SAVE NEW PAYMENT
@@ -45,14 +47,14 @@ public class PaymentUseCase {
             log.info("EXCEPTION DURING EXTERNAL PAYMENT, UPDATING PAYMENT AND STARTING ORDER COMPENSATION");
             paymentResource.setStatus(PaymentStatusEnum.ERROR_PROCESSING_PAYMENT.name());
             paymentResource.setStatusId(PaymentStatusEnum.ERROR_PROCESSING_PAYMENT.getId());
-            paymentResource = paymentService.savePayment(paymentResource);
+            paymentResource = paymentService.updatePayment(paymentResource);
 
             //SENDING COMPENSATION TO ORDER SERVICE
             orderResource.setTransactionEventType(TransactionEventTypeEnum.COMPENSATION);
             orderEventProducer.sendOrderEvent(orderResource);
 
             log.info("END USECASE NEW PAYMENT FOR ORDER: {}", orderResource);
-            return paymentResource;
+            return;
         }
 
         log.info("PAYMENT SUCCESSFUL");
@@ -60,11 +62,10 @@ public class PaymentUseCase {
         paymentResource.setStatus(PaymentStatusEnum.PAID.name());
         paymentResource.setStatusId(PaymentStatusEnum.PAID.getId());
 
-        paymentResource = paymentService.savePayment(paymentResource);
+        paymentResource = paymentService.updatePayment(paymentResource);
 
         productEventProducer.sendProductEvent(paymentResource);
 
         log.info("END USECASE NEW PAYMENT FOR ORDER: {}", orderResource);
-        return paymentResource;
     }
 }

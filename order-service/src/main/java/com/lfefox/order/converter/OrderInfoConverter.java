@@ -4,8 +4,6 @@ import com.lfefox.common.resource.OrderInfoResource;
 import com.lfefox.order.entity.OrderInfo;
 import com.lfefox.order.entity.OrderProduct;
 import org.apache.commons.lang3.ObjectUtils;
-
-
 import java.util.*;
 
 /**
