@@ -35,7 +35,7 @@ public class OrderEventProducer {
         emitter.send(Record.of(orderResource.getOrderId(), jsonToSend))
                 .whenComplete((success, failure) -> {
                     if (failure != null) {
-                        log.error("Error sending message to payment-service on channel {} error: {} ", "order-out", failure.getMessage());
+                        log.error("Error sending message to order-service on channel {} error: {} ", "order-out", failure.getMessage());
                     } else {
                         log.info("Message for payment-service sent successfully on channel: {}", "order-out");
                     }

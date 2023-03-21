@@ -38,10 +38,14 @@ public class OrderService {
         return orderResource;
     }
 
-    @Transactional
+    @Transactional()
     public OrderInfoResource updateOrder(OrderInfoResource orderResource){
         log.info("updateOrder in DB: {}", orderResource);
-
-        return orderResource;
+        OrderInfo orderInfo = OrderInfo.findById(orderResource.getOrderId());
+        orderInfo.setStatus(orderResource.getStatus());
+        orderInfo.setStatusId(orderResource.getStatusId());
+        orderInfo.getCreateDate();
+        orderInfo.persist();
+        return OrderInfoConverter.toResource(orderInfo);
     }
 }

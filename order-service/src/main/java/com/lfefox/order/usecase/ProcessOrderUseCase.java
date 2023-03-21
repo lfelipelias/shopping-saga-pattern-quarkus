@@ -19,11 +19,11 @@ import javax.inject.Inject;
 public class ProcessOrderUseCase {
 
 
-    private final OrderService orderService;
+    final OrderService orderService;
 
     @Inject
     @Channel("payment-out")
-    private Emitter<Record<Long, String>> emitter;
+    Emitter<Record<Long, String>> emitter;
 
 
     @SneakyThrows

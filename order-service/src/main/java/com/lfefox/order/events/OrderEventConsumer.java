@@ -12,6 +12,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 /**
@@ -19,10 +20,12 @@ import javax.transaction.Transactional;
  */
 @Slf4j
 @ApplicationScoped
-@RequiredArgsConstructor
+
 public class OrderEventConsumer {
-    private final CancelOrderUseCase cancelOrderUseCase;
-    private final OrderService orderService;
+    @Inject
+    private CancelOrderUseCase cancelOrderUseCase;
+    @Inject
+    private OrderService orderService;
 
     @Transactional
     @SneakyThrows
