@@ -52,6 +52,6 @@ INSERT INTO order_info (user_id, status, status_id, create_date, total_order) VA
 INSERT INTO order_product (order_id, product_id, create_date, price) VALUES (1, 1, '2022-12-01', 900);
 INSERT INTO order_product (order_id, product_id, create_date, price) VALUES (1, 2, '2022-11-05', 300);
 
-
 INSERT INTO product (name, price, order_id, status, status_id, create_date) VALUES ('GAMER MONITOR', 900, 1, 'SELL_IN_PROGRESS', 2, '2022-05-05');
 INSERT INTO product (name, price, order_id, status, status_id, create_date) VALUES ('SSD HD', 300, 1, 'SELL_IN_PROGRESS', 2, '2022-05-05');
+
