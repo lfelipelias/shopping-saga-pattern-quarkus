@@ -23,9 +23,9 @@ import javax.transaction.Transactional;
 
 public class OrderEventConsumer {
     @Inject
-    private CancelOrderUseCase cancelOrderUseCase;
+    CancelOrderUseCase cancelOrderUseCase;
     @Inject
-    private OrderService orderService;
+    OrderService orderService;
 
     @Transactional
     @SneakyThrows
