@@ -33,6 +33,8 @@ public class ProductUseCase {
             productService.processOrder(orderResource);
         } catch(Exception e){
 
+            productService.changeProductsToAvailable(orderResource);
+
             //SAVING PAYMENT ERROR
             log.info("EXCEPTION DURING PROCESSING PRODUCTS, STARTING PAYMENT COMPENSATION");
 

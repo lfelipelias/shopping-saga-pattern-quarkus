@@ -41,6 +41,25 @@ public class ProductService {
 
     }
 
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public void changeProductsToAvailable(OrderInfoResource orderResource){
+        log.info("changeProductsToAvailable: {}", orderResource);
+
+        List<Product> products = Product.find("orderId", orderResource.getOrderId()).list();
+
+        if(!ObjectUtils.isEmpty(products)){
+            products.forEach(prod ->{
+                prod.setStatusId(ProductStatusEnum.AVAILABLE.getId());
+                prod.setStatus(ProductStatusEnum.AVAILABLE.name());
+            });
+        }
+
+        Product.persist(products);
+
+        log.info("setting status of products to : {}", ProductStatusEnum.AVAILABLE.name());
+
+    }
+
     @Transactional
     public List<ProductResource> listProducts(OrderInfoResource orderResource){
         log.info("listingProducts for orderId: {} with productStatus: {} ", orderResource.getOrderId(), ProductStatusEnum.SELL_IN_PROGRESS.name());
