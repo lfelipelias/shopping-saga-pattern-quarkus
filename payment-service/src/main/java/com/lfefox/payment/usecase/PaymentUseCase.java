@@ -1,5 +1,6 @@
 package com.lfefox.payment.usecase;
 
+import com.lfefox.common.enums.OrderStatusEnum;
 import com.lfefox.common.enums.PaymentStatusEnum;
 import com.lfefox.common.enums.TransactionEventTypeEnum;
 import com.lfefox.common.resource.OrderInfoResource;
@@ -50,6 +51,8 @@ public class PaymentUseCase {
             paymentResource = paymentService.updatePayment(paymentResource);
 
             //SENDING COMPENSATION TO ORDER SERVICE
+            orderResource.setStatus(OrderStatusEnum.ERROR_PAYMENT.name());
+            orderResource.setStatusId(OrderStatusEnum.ERROR_PAYMENT.getId());
             orderResource.setTransactionEventType(TransactionEventTypeEnum.COMPENSATION);
             orderEventProducer.sendOrderEvent(orderResource);
 

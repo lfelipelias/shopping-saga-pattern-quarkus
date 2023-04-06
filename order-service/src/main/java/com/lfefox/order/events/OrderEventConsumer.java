@@ -38,8 +38,8 @@ public class OrderEventConsumer {
 
         log.info("receiving event for order: {}", orderResource);
         if (TransactionEventTypeEnum.COMPENSATION == orderResource.getTransactionEventType()) {
-            orderResource.setStatus(OrderStatusEnum.ERROR_PAYMENT.name());
-            orderResource.setStatusId(OrderStatusEnum.ERROR_PAYMENT.getId());
+            orderResource.setStatus(orderResource.getStatus());
+            orderResource.setStatusId(orderResource.getStatusId());
             cancelOrderUseCase.cancelOrder(orderResource);
 
         } else if (TransactionEventTypeEnum.COMPLETE_ORDER == orderResource.getTransactionEventType()) {

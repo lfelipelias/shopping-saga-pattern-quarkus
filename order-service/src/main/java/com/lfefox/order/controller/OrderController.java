@@ -1,6 +1,7 @@
 package com.lfefox.order.controller;
 
 import com.lfefox.common.resource.OrderInfoResource;
+import com.lfefox.order.usecase.NewOrderUserCase;
 import com.lfefox.order.usecase.ProcessOrderUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,12 +24,17 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class OrderController {
 
-    private final ProcessOrderUseCase orderSaga;
+    private final ProcessOrderUseCase processOrderUseCase;
+    private final NewOrderUserCase newOrderUserCase;
 
+    @POST()
+    public Response newOrder(OrderInfoResource orderResource, @Context UriInfo uriInfo) {
+        return Response.ok(newOrderUserCase.newOrder(orderResource)).build();
+    }
 
     @POST()
     @Path("process-order")
     public Response processOrder(OrderInfoResource orderResource, @Context UriInfo uriInfo) {
-       return Response.ok(orderSaga.processOrder(orderResource)).build();
+       return Response.ok(processOrderUseCase.processOrder(orderResource)).build();
     }
 }

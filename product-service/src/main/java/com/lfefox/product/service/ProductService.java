@@ -42,6 +42,30 @@ public class ProductService {
     }
 
     @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public void changeProductsToSellInProgress(OrderInfoResource orderResource){
+        log.info("changeProductsToSellInProgress: {}", orderResource);
+
+
+        orderResource.getOrderProductResources().forEach(op ->{
+            Product product = Product.findById(op.getProductId());
+            if(product != null && product.getStatusId() == ProductStatusEnum.AVAILABLE.getId()){
+                product.setOrderId(orderResource.getOrderId());
+                product.setStatus(ProductStatusEnum.SELL_IN_PROGRESS.name());
+                product.setStatusId(ProductStatusEnum.SELL_IN_PROGRESS.getId());
+                product.persist();
+            } else {
+                throw new RuntimeException("PRODUCT STATUS IS NOT AVAILABLE");
+            }
+        });
+
+
+
+
+        log.info("setting status of products to : {}", ProductStatusEnum.AVAILABLE.name());
+
+    }
+
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
     public void changeProductsToAvailable(OrderInfoResource orderResource){
         log.info("changeProductsToAvailable: {}", orderResource);
 
@@ -51,6 +75,7 @@ public class ProductService {
             products.forEach(prod ->{
                 prod.setStatusId(ProductStatusEnum.AVAILABLE.getId());
                 prod.setStatus(ProductStatusEnum.AVAILABLE.name());
+                prod.setOrderId(null);
             });
         }
 
