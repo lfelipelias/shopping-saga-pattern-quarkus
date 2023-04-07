@@ -1,4 +1,4 @@
-version: '3.5'
+version: '3.9'
 
 services:
 
@@ -13,7 +13,7 @@ services:
     environment:
       LOG_DIR: /tmp/logs
     networks:
-      - kafka-quickstart-network
+      - shopping-network
 
   kafka:
     image: quay.io/strimzi/kafka:0.23.0-kafka-2.8.0
@@ -23,6 +23,12 @@ services:
     ]
     depends_on:
       - zookeeper
+    healthcheck:
+      test: nc -z localhost 9092 || exit -1
+      start_period: 15s
+      interval: 5s
+      timeout: 10s
+      retries: 10
     ports:
       - "9092:9092"
     environment:
@@ -31,34 +37,67 @@ services:
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     networks:
-      - kafka-quickstart-network
+      - shopping-network
 
-  producer:
-    image: quarkus-quickstarts/kafka-quickstart-producer:1.0-${QUARKUS_MODE:-jvm}
+  quarkus-db:
+    image: "postgres:13.3"
+    volumes:
+      - ./import-postgres.sql:/docker-entrypoint-initdb.d/import-postgres.sql
+    environment:
+      - POSTGRES_USER=shopping_user
+      - POSTGRES_PASSWORD=shopping_pass
+      - POSTGRES_DB=shopping
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quarkus"]
+      interval: 5s
+      timeout: 5s
+      retries: 6
+    ports:
+      - "5432:5432"
+    networks:
+      - shopping-network
+
+  order-service:
+    image: eliasf/order-service:1.0.0-SNAPSHOT
     build:
-      context: producer
-      dockerfile: src/main/docker/Dockerfile.${QUARKUS_MODE:-jvm}
+      context: order-service
+      dockerfile: src/main/docker/Dockerfile.native
     depends_on:
-      - kafka
+      quarkus-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      QUARKUS_DATASOURCE_URL: jdbc:postgresql://quarkus-db:5432/shopping
+      QUARKUS_DATASOURCE_USER: shopping_user
+      QUARKUS_DATASOURCE_PASSWORD: shopping_pass
     ports:
       - "8080:8080"
     networks:
-      - kafka-quickstart-network
+      - shopping-network
 
-  processor:
-    image: quarkus-quickstarts/kafka-quickstart-processor:1.0-${QUARKUS_MODE:-jvm}
+  payment-service:
+    image: eliasf/payment-service:1.0.0-SNAPSHOT
     build:
-      context: processor
-      dockerfile: src/main/docker/Dockerfile.${QUARKUS_MODE:-jvm}
+      context: payment-service
+      dockerfile: src/main/docker/Dockerfile.native
     depends_on:
-      - kafka
+      quarkus-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      QUARKUS_DATASOURCE_URL: jdbc:postgresql://quarkus-db:5432/shopping
+      QUARKUS_DATASOURCE_USER: shopping_user
+      QUARKUS_DATASOURCE_PASSWORD: shopping_pass
+    ports:
+      - "8081:8080"
     networks:
-      - kafka-quickstart-network
+      - shopping-network
 
 networks:
-  kafka-quickstart-network:
-    name: kafkaquickstart
+  shopping-network:
+    driver: bridge
+    name: shoppingnetwork
