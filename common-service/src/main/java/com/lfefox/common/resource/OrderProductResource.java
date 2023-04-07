@@ -1,8 +1,11 @@
 package com.lfefox.common.resource;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -11,7 +14,9 @@ import java.util.Date;
  */
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
+@RegisterForReflection
 public class OrderProductResource {
 
     private OrderInfoResource orderInfo;

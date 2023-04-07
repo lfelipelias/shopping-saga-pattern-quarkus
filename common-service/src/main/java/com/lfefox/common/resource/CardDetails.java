@@ -1,9 +1,7 @@
 package com.lfefox.common.resource;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import io.quarkus.runtime.annotations.RegisterForReflection;
+import lombok.*;
 
 /**
  * Felipe.Elias
@@ -11,7 +9,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@Builder
+@NoArgsConstructor
+@RegisterForReflection
 public class CardDetails {
 
     private String name;

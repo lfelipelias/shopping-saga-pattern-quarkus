@@ -1,8 +1,8 @@
 package com.lfefox.common.resource;
 
 import com.lfefox.common.enums.TransactionEventTypeEnum;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import io.quarkus.runtime.annotations.RegisterForReflection;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -11,8 +11,11 @@ import java.util.List;
 /**
  * Felipe.Elias
  */
-@Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
+@RegisterForReflection
 public class OrderInfoResource {
 
     private Long orderId;

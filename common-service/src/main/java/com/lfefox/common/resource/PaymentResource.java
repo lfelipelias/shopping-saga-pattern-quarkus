@@ -2,16 +2,19 @@ package com.lfefox.common.resource;
 
 
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import io.quarkus.runtime.annotations.RegisterForReflection;
+import lombok.*;
 
 import java.util.Date;
 
 /**
  * Felipe.Elias
  */
-@Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
+@RegisterForReflection
 public class PaymentResource {
 
     private Long paymentId;
