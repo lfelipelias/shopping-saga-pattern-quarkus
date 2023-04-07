@@ -12,7 +12,6 @@ import java.util.Date;
 @Setter
 @ToString
 @NoArgsConstructor
-@RegisterForReflection
 public class ProductResource {
 
     private Long productId;

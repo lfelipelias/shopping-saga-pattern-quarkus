@@ -15,7 +15,6 @@ import java.util.List;
 @Setter
 @ToString
 @NoArgsConstructor
-@RegisterForReflection
 public class OrderInfoResource {
 
     private Long orderId;

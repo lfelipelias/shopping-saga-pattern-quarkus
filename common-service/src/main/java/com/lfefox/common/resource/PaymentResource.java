@@ -14,7 +14,6 @@ import java.util.Date;
 @Setter
 @ToString
 @NoArgsConstructor
-@RegisterForReflection
 public class PaymentResource {
 
     private Long paymentId;

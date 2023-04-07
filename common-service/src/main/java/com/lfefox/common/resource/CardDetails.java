@@ -10,7 +10,6 @@ import lombok.*;
 @Setter
 @ToString
 @NoArgsConstructor
-@RegisterForReflection
 public class CardDetails {
 
     private String name;

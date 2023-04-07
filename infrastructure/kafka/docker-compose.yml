@@ -97,6 +97,25 @@ services:
     networks:
       - shopping-network
 
+  product-service:
+    image: eliasf/product-service:1.0.0-SNAPSHOT
+    build:
+      context: product-service
+      dockerfile: src/main/docker/Dockerfile.native
+    depends_on:
+      quarkus-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      QUARKUS_DATASOURCE_URL: jdbc:postgresql://quarkus-db:5432/shopping
+      QUARKUS_DATASOURCE_USER: shopping_user
+      QUARKUS_DATASOURCE_PASSWORD: shopping_pass
+    ports:
+      - "8082:8080"
+    networks:
+      - shopping-network
 networks:
   shopping-network:
     driver: bridge

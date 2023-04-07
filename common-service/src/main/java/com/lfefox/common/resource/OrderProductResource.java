@@ -16,7 +16,6 @@ import java.util.Date;
 @Setter
 @ToString
 @NoArgsConstructor
-@RegisterForReflection
 public class OrderProductResource {
 
     private OrderInfoResource orderInfo;
