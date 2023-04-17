@@ -1,0 +1,10 @@
+Tagging images before pushing to dockerhub
+
+docker image tag eliasf/order-service:1.0.0-SNAPSHOT lfelipelias/order-service:1.0.0-SNAPSHOT
+docker image tag eliasf/payment-service:1.0.0-SNAPSHOT lfelipelias/payment-service:1.0.0-SNAPSHOT
+docker image tag eliasf/product-service:1.0.0-SNAPSHOT lfelipelias/product-service:1.0.0-SNAPSHOT
+
+Pushing images to dockerhub
+docker image push lfelipelias/order-service:1.0.0-SNAPSHOT
+docker image push lfelipelias/payment-service:1.0.0-SNAPSHOT
+docker image push lfelipelias/product-service:1.0.0-SNAPSHOT

@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-svc
+  template:
+    metadata:
+      labels:
+        app: order-svc
+    spec:
+      containers:
+        - image: lfelipelias/order-service:1.0.0-SNAPSHOT
+          name: order-service
+          ports:
+            - containerPort: 8080
+          env:
+            - name: KAFKA_SERVICE
+              valueFrom:
+                configMapKeyRef:
+                  name: shopping-configmap
+                  key: kafka_service
+
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "$(KAFKA_SERVICE):9092"
+
+            - name: QUARKUS_DB_SERVICE
+              valueFrom:
+                configMapKeyRef:
+                  name: shopping-configmap
+                  key: database_service
+
+            - name: QUARKUS_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: shopping-configmap
+                  key: database_name
+
+            - name: QUARKUS_DATASOURCE_URL
+              value: "jdbc:postgresql://$(QUARKUS_DB_SERVICE):5432/$(QUARKUS_DB_NAME)"
+
+            - name: QUARKUS_DATASOURCE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: shopping-secret
+                  key: shopping-root-username
+
+            - name: QUARKUS_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shopping-secret
+                  key: shopping-root-password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-svc-service
+spec:
+  ports:
+    - protocol: "TCP"
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: order-svc
+  type: NodePort

@@ -3,5 +3,6 @@ kind: ConfigMap
 metadata:
   name: shopping-configmap
 data:
-  database_url: postgresql
+  kafka_service: kafka-service
+  database_service: postgresql
   database_name: shopping
