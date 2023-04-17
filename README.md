@@ -38,7 +38,7 @@ kubectl get secret
 kubectl describe secretname
 
 
-Database config:
+Database deployment:
 
 - kubectl apply -f shopping-configmap.yaml
 - kubectl apply -f shopping-database-secret.yaml 
@@ -48,6 +48,19 @@ Database config:
 - kubectl apply -f shopping-database-deployment.yaml
 - kubectl apply -f shopping-database-ingress.yml
 
+
+Kafka deployment:
+- kubectl apply -f zookeeper-deployment.yaml
+  - kubectl apply -f kafka-deployment.yaml
+  
+    - check the deployment is working:
+      kubectl exec -it kafka-deployment-7985656cd5-4fm6g -- /bin/bash
+      
+      //CREATING TOPIC
+      kafka-topics --create --bootstrap-server localhost:29092 --replication-factor 1 --partitions 1 --topic minikube-topic
+      //WATCHING THE TOPICS
+      kafka-console-consumer --bootstrap-server localhost:29092 --topic minikube-topic
+    
 
 # PORT FORWARD TO CONNECT TO THE DATABASE USING DBEAVER
 - kubectl port-forward pod/postgresql-99bcfd89b-bgnpj 5432:5432
