@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: postgresql
+    labels:
+        app: postgresql
+        tier: database
+spec:
+    selector:
+        matchLabels:
+            app: postgresql
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                app: postgresql
+                tier: database
+        spec:
+            containers:
+                - name: postgresql
+                  image: postgres:13.3
+                  imagePullPolicy: "IfNotPresent"
+                  env:
+                      - name: POSTGRES_DB
+                        valueFrom:
+                          configMapKeyRef:
+                            name: shopping-configmap
+                            key: database_name
+                      - name: POSTGRES_USER
+                        valueFrom:
+                          secretKeyRef:
+                            name: shopping-secret
+                            key: shopping-root-username
+                      - name: POSTGRES_PASSWORD
+                        valueFrom:
+                          secretKeyRef:
+                            name: shopping-secret
+                            key: shopping-root-password
+                  ports:
+                      - containerPort: 5432
+                        name: postgresql
+                  volumeMounts:
+                      - name: postgresql-claim0
+                        mountPath: /var/lib/postgresql/data
+
+                      - mountPath: /docker-entrypoint-initdb.d
+                        name: postgresql-initdb
+            volumes:
+                - name: postgresql-claim0
+                  persistentVolumeClaim:
+                      claimName: postgresql-claim0
+
+                - name: postgresql-initdb
+                  configMap:
+                      name: postgresql-initdb-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql
+  labels:
+    app: postgresql
+    tier: database
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: postgresql
+    tier: database

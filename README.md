@@ -30,6 +30,30 @@ Application consists of 3 microservices that work together and implement a full 
 
 
 
+# Kubernetes
+
+Useful commands:
+
+kubectl get secret
+kubectl describe secretname
+
+
+Database config:
+
+- kubectl apply -f shopping-configmap.yaml
+- kubectl apply -f shopping-database-secret.yaml 
+- kubectl apply -f shopping-database-claim0-persistentvolume.yaml
+- kubectl apply -f shopping-database-claim0-persistentvolumeclaim.yaml
+- kubectl apply -f shopping-database-initial-data-configmap.yaml
+- kubectl apply -f shopping-database-deployment.yaml
+- kubectl apply -f shopping-database-ingress.yml
+
+
+# PORT FORWARD TO CONNECT TO THE DATABASE USING DBEAVER
+- kubectl port-forward pod/postgresql-99bcfd89b-bgnpj 5432:5432
+
+
+
 If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
 
 ## Running the application in dev mode
