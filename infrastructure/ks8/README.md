@@ -1,9 +1,8 @@
 # Kubernetes cluster config:
 
-Tag all images and push to docker hub
+Tag and push all images to docker hub before doing the steps below! 
 
-
-General ConfigMap (current folder):
+General ConfigMap:
 
 ```shell script
 kubectl apply -f shopping-configmap.yaml
@@ -24,7 +23,7 @@ kubectl apply -f shopping-database-ingress.yml
 kubectl port-forward pod/postgresql-99bcfd89b-bgnpj 5432:5432
 ```
 
-Kafka deployment (kafka folder):
+Kafka deployment:
 ```shell script
 cd kafka
 kubectl apply -f zookeeper-deployment.yaml
@@ -52,7 +51,24 @@ cd services
 kubectl apply -f order-deployment.yaml
 kubectl apply -f payment-deployment.yaml
 kubectl apply -f product-deployment.yaml
+
+# configuring shopping ingress (nginx ingress must be configured before this step!)
+kubectl apply -f shopping-ingress.yaml
+
+# use this command and get the IP in ADDRESS column for shopping-ingress
+kubectl get ingress
+
+# edit C:\Windows\System32\drivers\etc\hosts and paste:
+172.18.6.70 shopping.com
 ```
+
+
+
+# Application is ready to serve requests:
+
+![plot](../../documentation/images/process-order-postman.JPG)
+
+
 
 
 kubectl useful commands:
@@ -61,4 +77,18 @@ kubectl useful commands:
 # watch pod logs 
 kubectl logs -f pod/order-deployment-55747fdf98-mbrmz
 kubectl logs pod/order-deployment-55747fdf98-mbrmz --tail=100
+
+# get application ingress deployed in your cluster
+kubectl get ingress
+```
+
+Ingress controller configuration (optional):
+
+```shell script
+# apply nginx ingress
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.2/deploy/static/provider/cloud/deploy.yaml
+
+
+# get ingress-nginx external IP
+kubectl get services -n ingress-nginx
 ```

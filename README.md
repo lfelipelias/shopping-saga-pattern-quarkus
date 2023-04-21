@@ -21,6 +21,7 @@ This application consists of 3 microservices that work together and implement a 
 * Deploying Quarkus native images on Docker for all microservices, tagging/pushing to Docker Hub before configuring Kubernetes cluster:
   - common-service
     ([see common-service/README.md](./common-service/README.md))
+  
   - order-service
     ([see order-service/README.md](./order-service/README.md))
     
@@ -73,7 +74,7 @@ This application consists of 3 microservices that work together and implement a 
   - Deployment of all components of this project (PostegreSQL, Kafka, Quarkus native image of each microservice in this application)
 
 # Kubernetes Architecture
-![plot](./documentation/architecture-k8s.png)
+![plot](documentation/images/architecture-k8s.png)
 
 # Saga Choreography 
-![plot](./documentation/saga-choreography-flow.png)
+![plot](documentation/images/saga-choreography-flow.png)
