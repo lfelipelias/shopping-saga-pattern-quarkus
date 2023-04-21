@@ -28,8 +28,8 @@ This application consists of 3 microservices that work together and implement a 
   - payment-service
     ([see payment-service/README.md](./payment-service/README.md))
 
-  - payment-service
-    ([see payment-service/README.md](./payment-service/README.md))
+  - product-service
+    ([see product-service/README.md](./product-service/README.md))
 
 
 
