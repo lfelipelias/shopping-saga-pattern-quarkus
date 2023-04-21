@@ -1,153 +1,79 @@
 # Quarkus Shopping Microservices
 
-This project offers a complete architecture for microservices application containing:
+This project offers a complete architecture to deploy Quarkus microservices using native image in a Kubernetes cluster or Docker.
+Each microservice has its own database and communication between other microservices is implemented using Kafka as message broker. 
+The purpose of this architecture is to use the best Design Patterns for microservice applications. 
+
+# Application explained
+This application consists of 3 microservices that work together and implement a full transaction flow for online shopping and also compensation flow to rollback all transactions performed by other microservices when processing an order:
+
+- Order microservice: starting point responsible for creating/processing orders, it is also the start point to communicate with other microservices
+- Payment microservice: responsible for payment business
+- Product microservice: responsible for controlling products 
+
+
+
+
+
+
+# Deploying the application
+
+* Deploying Quarkus native images on Docker for all microservices, tagging/pushing to Docker Hub before configuring Kubernetes cluster:
+  - common-service
+    ([see common-service/README.md](./common-service/README.md))
+  - order-service
+    ([see order-service/README.md](./order-service/README.md))
+    
+  - payment-service
+    ([see payment-service/README.md](./payment-service/README.md))
+
+  - payment-service
+    ([see payment-service/README.md](./payment-service/README.md))
+
+
+
+* Kubernetes deployment:
+  - Step-by-step to deploy all components of this project in K8s cluster composed by: microservices using native image, database and kafka.
+
+    ([see infrastructure/ks8/README.md](./infrastructure/ks8/README.md))
+
+
+* Docker deployment:
+    - docker-compose to run the all containers that compose the application such as:  microservices using native image, database and kafka.
+     
+      ([see infrastructure/docker-compose](./infrastructure/docker-compose))
+  
+
+
+# Technologies and Design Patterns in this project:
 
 * Microservices Patterns:
-    - Event Sourcing Pattern to recreate state of transactions performed.
-    - SAGA Pattern using choreography and combining message exchange between the microservices using KAFKA as message broker.
-  
-
-* Quarkus and its features:
-    - Native Image
-    - Hibernate Reactive to perform the CRUD operations on the database
-    - RESTEasy Reactive to expose the REST endpoints
-
-    
-* Docker:
-    - docker-compose to run the all containers that compose the application such as: database with initialization script, message broker, microservices native images .
-     ([see infrastructure/docker-compose](./infrastructure/docker-compose))
+  - Event Sourcing Pattern to recreate state of transactions performed.
+  - SAGA Pattern using choreography and combining message exchange between the microservices using KAFKA as message broker.
 
 
-# The application
-Application consists of 3 microservices that work together and implement a full transaction flow for online shopping and also compensation flow to rollback all transactions performed by other microservices during the order process:
-    
-- Order microservice: starting point responsible for creating/processing orders and sending messages to other services using KAFKA.
-- Payment microservice: responsible for payment business logic and contacting 
-- Product microservice: responsible for controlling products that will be sold and calling order service to complete an order or calling payment-service to start the compensating process to cancel an order.
+ 
+
+* Quarkus:
+  - Native Image
+  - Hibernate ORM with Panache Reactive
+  - SmallRye Reactive Messaging
+  - RESTEasy Reactive to expose the REST endpoints
 
 
+* Kafka:
+  - message broker
 
 
+* PostgreSQL:
+  - database
 
 
-# Kubernetes
+* Kubernetes:
+  - Deployment of all components of this project (PostegreSQL, Kafka, Quarkus native image of each microservice in this application)
 
-Useful commands:
+# Kubernetes Architecture
+![plot](./documentation/architecture-k8s.png)
 
-kubectl get secret
-kubectl describe secretname
-
-
-Database deployment:
-
-- kubectl apply -f shopping-configmap.yaml
-- kubectl apply -f shopping-database-secret.yaml 
-- kubectl apply -f shopping-database-claim0-persistentvolume.yaml
-- kubectl apply -f shopping-database-claim0-persistentvolumeclaim.yaml
-- kubectl apply -f shopping-database-initial-data-configmap.yaml
-- kubectl apply -f shopping-database-deployment.yaml
-- kubectl apply -f shopping-database-ingress.yml
-
-
-Kafka deployment:
-- kubectl apply -f zookeeper-deployment.yaml
-- kubectl apply -f kafka-deployment.yaml
-  
-  - check the deployment is working:
-    kubectl exec -it kafka-deployment-7985656cd5-4fm6g -- /bin/bash
-      
-    //CREATING TOPIC
-    kafka-topics --create --bootstrap-server localhost:29092 --replication-factor 1 --partitions 1 --topic minikube-topic
-    //WATCHING THE TOPICS
-    kafka-console-consumer --bootstrap-server localhost:29092 --topic minikube-topic
-    
-
-# PORT FORWARD TO CONNECT TO THE DATABASE USING DBEAVER
-- kubectl port-forward pod/postgresql-99bcfd89b-bgnpj 5432:5432
-
-
-
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
-
-## Running the application in dev mode
-
-You can run your application in dev mode that enables live coding using:
-```shell script
-./mvnw compile quarkus:dev
-```
-
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
-
-## Packaging and running the application
-
-The application can be packaged using:
-```shell script
-./mvnw package
-```
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
-
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
-
-If you want to build an _über-jar_, execute the following command:
-```shell script
-./mvnw package -Dquarkus.package.type=uber-jar
-```
-
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using:
-```shell script
-./mvnw package -Pnative
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
-```shell script
-./mvnw package -Pnative -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./target/code-with-quarkus-1.0.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.
-
-## Related Guides
-
-- JDBC Driver - H2 ([guide](https://quarkus.io/guides/datasource)): Connect to the H2 database via JDBC
-- Hibernate Validator ([guide](https://quarkus.io/guides/validation)): Validate object properties (field, getter) and method parameters for your beans (REST, CDI, JPA)
-- SmallRye OpenAPI ([guide](https://quarkus.io/guides/openapi-swaggerui)): Document your REST APIs with OpenAPI - comes with Swagger UI
-- RESTEasy Reactive ([guide](https://quarkus.io/guides/resteasy-reactive)): A JAX-RS implementation utilizing build time processing and Vert.x. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it.
-- SmallRye Reactive Messaging - Kafka Connector ([guide](https://quarkus.io/guides/kafka-reactive-getting-started)): Connect to Kafka with Reactive Messaging
-- Hibernate ORM with Panache ([guide](https://quarkus.io/guides/hibernate-orm-panache)): Simplify your persistence code for Hibernate ORM via the active record or the repository pattern
-- SmallRye Health ([guide](https://quarkus.io/guides/microprofile-health)): Monitor service health
-
-## Provided Code
-
-### Hibernate ORM
-
-Create your first JPA entity
-
-[Related guide section...](https://quarkus.io/guides/hibernate-orm)
-
-[Related Hibernate with Panache section...](https://quarkus.io/guides/hibernate-orm-panache)
-
-
-### Reactive Messaging codestart
-
-Use SmallRye Reactive Messaging
-
-[Related Apache Kafka guide section...](https://quarkus.io/guides/kafka-reactive-getting-started)
-
-
-### RESTEasy Reactive
-
-Easily start your Reactive RESTful Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
-
-### SmallRye Health
-
-Monitor your application's health using SmallRye Health
-
-[Related guide section...](https://quarkus.io/guides/smallrye-health)
+# Saga Choreography 
+![plot](./documentation/saga-choreography-flow.png)
