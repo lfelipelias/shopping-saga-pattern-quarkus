@@ -42,7 +42,7 @@ This application consists of 3 microservices that work together and implement a 
 * Docker deployment:
     - docker-compose to run the all containers that compose the application such as:  microservices using native image, database and kafka.
      
-      ([see infrastructure/docker-compose](./infrastructure/docker-compose))
+      ([see infrastructure/docker-compose/README.md](./infrastructure/docker-compose/README.md))
   
 
 
