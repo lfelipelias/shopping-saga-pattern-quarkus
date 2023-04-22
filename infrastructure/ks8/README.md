@@ -75,8 +75,8 @@ kubectl useful commands:
 
 ```shell script
 # watch pod logs 
-kubectl logs -f pod/order-deployment-55747fdf98-mbrmz
-kubectl logs pod/order-deployment-55747fdf98-mbrmz --tail=100
+kubectl logs -f pod/order-svc-55747fdf98-mbrmz
+kubectl logs pod/order-55747fdf98-mbrmz --tail=100
 
 # get application ingress deployed in your cluster
 kubectl get ingress
@@ -92,3 +92,6 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
 # get ingress-nginx external IP
 kubectl get services -n ingress-nginx
 ```
+
+Kubernetes cheatsheet:
+https://kubernetes.io/docs/reference/kubectl/cheatsheet/
