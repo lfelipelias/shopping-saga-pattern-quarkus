@@ -2,42 +2,42 @@ version: '3.9'
 
 services:
 
-  zookeeper:
-    image: quay.io/strimzi/kafka:0.23.0-kafka-2.8.0
-    command: [
-      "sh", "-c",
-      "bin/zookeeper-server-start.sh config/zookeeper.properties"
-    ]
-    ports:
-      - "2181:2181"
-    environment:
-      LOG_DIR: /tmp/logs
-    networks:
-      - shopping-network
-
-  kafka:
-    image: quay.io/strimzi/kafka:0.23.0-kafka-2.8.0
-    command: [
-      "sh", "-c",
-      "bin/kafka-server-start.sh config/server.properties --override listeners=$${KAFKA_LISTENERS} --override advertised.listeners=$${KAFKA_ADVERTISED_LISTENERS} --override zookeeper.connect=$${KAFKA_ZOOKEEPER_CONNECT}"
-    ]
-    depends_on:
-      - zookeeper
-    healthcheck:
-      test: nc -z localhost 9092 || exit -1
-      start_period: 15s
-      interval: 5s
-      timeout: 10s
-      retries: 10
-    ports:
-      - "9092:9092"
-    environment:
-      LOG_DIR: "/tmp/logs"
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-    networks:
-      - shopping-network
+#  zookeeper:
+#    image: quay.io/strimzi/kafka:0.23.0-kafka-2.8.0
+#    command: [
+#      "sh", "-c",
+#      "bin/zookeeper-server-start.sh config/zookeeper.properties"
+#    ]
+#    ports:
+#      - "2181:2181"
+#    environment:
+#      LOG_DIR: /tmp/logs
+#    networks:
+#      - shopping-network
+#
+#  kafka:
+#    image: quay.io/strimzi/kafka:0.23.0-kafka-2.8.0
+#    command: [
+#      "sh", "-c",
+#      "bin/kafka-server-start.sh config/server.properties --override listeners=$${KAFKA_LISTENERS} --override advertised.listeners=$${KAFKA_ADVERTISED_LISTENERS} --override zookeeper.connect=$${KAFKA_ZOOKEEPER_CONNECT}"
+#    ]
+#    depends_on:
+#      - zookeeper
+#    healthcheck:
+#      test: nc -z localhost 9092 || exit -1
+#      start_period: 15s
+#      interval: 5s
+#      timeout: 10s
+#      retries: 10
+#    ports:
+#      - "9092:9092"
+#    environment:
+#      LOG_DIR: "/tmp/logs"
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+#      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+#    networks:
+#      - shopping-network
 
   quarkus-db:
     image: "postgres:13.3"
@@ -57,65 +57,65 @@ services:
     networks:
       - shopping-network
 
-  order-service:
-    image: eliasf/order-service:1.0.0-SNAPSHOT
-    build:
-      context: order-service
-      dockerfile: src/main/docker/Dockerfile.native
-    depends_on:
-      quarkus-db:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
-    environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      QUARKUS_DATASOURCE_URL: jdbc:postgresql://quarkus-db:5432/shopping
-      QUARKUS_DATASOURCE_USER: shopping_user
-      QUARKUS_DATASOURCE_PASSWORD: shopping_pass
-    ports:
-      - "8080:8080"
-    networks:
-      - shopping-network
-
-  payment-service:
-    image: eliasf/payment-service:1.0.0-SNAPSHOT
-    build:
-      context: payment-service
-      dockerfile: src/main/docker/Dockerfile.native
-    depends_on:
-      quarkus-db:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
-    environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      QUARKUS_DATASOURCE_URL: jdbc:postgresql://quarkus-db:5432/shopping
-      QUARKUS_DATASOURCE_USER: shopping_user
-      QUARKUS_DATASOURCE_PASSWORD: shopping_pass
-    ports:
-      - "8081:8080"
-    networks:
-      - shopping-network
-
-  product-service:
-    image: eliasf/product-service:1.0.0-SNAPSHOT
-    build:
-      context: product-service
-      dockerfile: src/main/docker/Dockerfile.native
-    depends_on:
-      quarkus-db:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
-    environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      QUARKUS_DATASOURCE_URL: jdbc:postgresql://quarkus-db:5432/shopping
-      QUARKUS_DATASOURCE_USER: shopping_user
-      QUARKUS_DATASOURCE_PASSWORD: shopping_pass
-    ports:
-      - "8082:8080"
-    networks:
-      - shopping-network
+#  order-service:
+#    image: eliasf/order-service:1.0.0-SNAPSHOT
+#    build:
+#      context: order-service
+#      dockerfile: src/main/docker/Dockerfile.native
+#    depends_on:
+#      quarkus-db:
+#        condition: service_healthy
+#      kafka:
+#        condition: service_healthy
+#    environment:
+#      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#      QUARKUS_DATASOURCE_URL: jdbc:postgresql://quarkus-db:5432/shopping
+#      QUARKUS_DATASOURCE_USER: shopping_user
+#      QUARKUS_DATASOURCE_PASSWORD: shopping_pass
+#    ports:
+#      - "8080:8080"
+#    networks:
+#      - shopping-network
+#
+#  payment-service:
+#    image: eliasf/payment-service:1.0.0-SNAPSHOT
+#    build:
+#      context: payment-service
+#      dockerfile: src/main/docker/Dockerfile.native
+#    depends_on:
+#      quarkus-db:
+#        condition: service_healthy
+#      kafka:
+#        condition: service_healthy
+#    environment:
+#      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#      QUARKUS_DATASOURCE_URL: jdbc:postgresql://quarkus-db:5432/shopping
+#      QUARKUS_DATASOURCE_USER: shopping_user
+#      QUARKUS_DATASOURCE_PASSWORD: shopping_pass
+#    ports:
+#      - "8081:8080"
+#    networks:
+#      - shopping-network
+#
+#  product-service:
+#    image: eliasf/product-service:1.0.0-SNAPSHOT
+#    build:
+#      context: product-service
+#      dockerfile: src/main/docker/Dockerfile.native
+#    depends_on:
+#      quarkus-db:
+#        condition: service_healthy
+#      kafka:
+#        condition: service_healthy
+#    environment:
+#      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#      QUARKUS_DATASOURCE_URL: jdbc:postgresql://quarkus-db:5432/shopping
+#      QUARKUS_DATASOURCE_USER: shopping_user
+#      QUARKUS_DATASOURCE_PASSWORD: shopping_pass
+#    ports:
+#      - "8082:8080"
+#    networks:
+#      - shopping-network
 networks:
   shopping-network:
     driver: bridge

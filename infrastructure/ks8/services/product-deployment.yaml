@@ -65,4 +65,4 @@ spec:
       targetPort: 8080
   selector:
     app: product-svc
-  type: NodePort
+  type: ClusterIP

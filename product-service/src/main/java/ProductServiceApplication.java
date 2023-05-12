@@ -10,9 +10,9 @@ import javax.ws.rs.core.Application;
 @ApplicationPath("/")
 @OpenAPIDefinition(
         info = @Info(
-                title = "Order Service API",
-                description = "This API allows operations on Order service",
+                title = "Product Service API",
+                description = "This API allows operations on Product service",
                 version = "1.0"
         )
 )
-public class OrderServiceApplication extends Application {}
+public class ProductServiceApplication extends Application {}
