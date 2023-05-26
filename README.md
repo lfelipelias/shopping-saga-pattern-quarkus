@@ -77,4 +77,4 @@ This application consists of 3 microservices that work together and implement a 
 ![plot](documentation/images/architecture-k8s.png)
 
 # Saga Choreography 
-![plot](documentation/images/saga-choreography-flow.png)
+![plot](documentation/images/process-order-diagram.png)

@@ -24,11 +24,11 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:8080/order/process-order",
+							"raw": "shopping.com/order/process-order",
 							"host": [
-								"localhost"
+								"shopping",
+								"com"
 							],
-							"port": "8080",
 							"path": [
 								"order",
 								"process-order"
@@ -52,11 +52,11 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:8080/order",
+							"raw": "shopping.com/order",
 							"host": [
-								"localhost"
+								"shopping",
+								"com"
 							],
-							"port": "8080",
 							"path": [
 								"order"
 							]
