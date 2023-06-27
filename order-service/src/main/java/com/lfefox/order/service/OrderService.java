@@ -6,13 +6,12 @@ import com.lfefox.common.resource.OrderInfoResource;
 import com.lfefox.order.converter.OrderInfoConverter;
 import com.lfefox.order.entity.OrderInfo;
 import com.lfefox.order.entity.OrderProduct;
+import io.quarkus.hibernate.reactive.panache.Panache;
+import io.smallrye.mutiny.Uni;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
-
 import javax.enterprise.context.ApplicationScoped;
-import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 
@@ -24,21 +23,21 @@ import java.util.HashSet;
 @RequiredArgsConstructor
 public class OrderService {
 
-    @Transactional
-    public OrderInfoResource processOrder(OrderInfoResource orderResource){
+    public Uni<OrderInfoResource> processOrder(OrderInfoResource orderResource){
         log.info("processing order : {}", orderResource);
-
-        OrderInfo orderInfo = OrderInfo.findById(orderResource.getOrderId());
-        orderInfo.setStatus(OrderStatusEnum.IN_PROGRESS.name());
-        orderInfo.setStatusId(OrderStatusEnum.IN_PROGRESS.getId());
-        orderInfo.persist();
-
-        return OrderInfoConverter.toResource(orderInfo);
+        return Panache
+                .withTransaction(() -> OrderInfo.<OrderInfo> findById(orderResource.getOrderId())
+                    .onItem().ifNotNull().invoke(entity -> {
+                        entity.setStatus(OrderStatusEnum.IN_PROGRESS.name());
+                        entity.setStatusId(OrderStatusEnum.IN_PROGRESS.getId());
+                    })
+                )
+                .onItem().ifNotNull().transform(updated -> OrderInfoConverter.toSimpleResource(updated));
     }
 
-    @Transactional
-    public OrderInfoResource createOrder(OrderInfoResource orderResource){
-        log.info("createOrderd in DB: {}", orderResource);
+
+    public Uni<OrderInfoResource> createOrder(OrderInfoResource orderResource){
+        log.info("createOrder in DB: {}", orderResource);
 
         OrderInfo orderInfo = new OrderInfo();
         orderInfo.setUserId(orderResource.getUserId());
@@ -62,21 +61,20 @@ public class OrderService {
                 orderInfo.getOrderProducts().add(orderProduct);
             });
         }
-
-        orderInfo.persist();
-
-
-        return OrderInfoConverter.toResource(orderInfo);
+        return Panache
+                .withTransaction(orderInfo::persist)
+                .onItem()
+                .transform(inserted -> OrderInfoConverter.toResource(orderInfo));
     }
 
-    @Transactional()
-    public OrderInfoResource updateOrder(OrderInfoResource orderResource){
+    public Uni<OrderInfoResource> updateOrder(OrderInfoResource orderResource){
         log.info("updateOrder in DB: {}", orderResource);
-        OrderInfo orderInfo = OrderInfo.findById(orderResource.getOrderId());
-        orderInfo.setStatus(orderResource.getStatus());
-        orderInfo.setStatusId(orderResource.getStatusId());
-        orderInfo.getCreateDate();
-        orderInfo.persist();
-        return OrderInfoConverter.toResource(orderInfo);
+        return Panache
+                .withTransaction(() -> OrderInfo.<OrderInfo> findById(orderResource.getOrderId())
+                    .onItem().ifNotNull().invoke(entity -> {
+                        entity.setStatus(orderResource.getStatus());
+                        entity.setStatusId(orderResource.getStatusId());
+                    }))
+                    .onItem().ifNotNull().transform(updated -> OrderInfoConverter.toSimpleResource(updated));
     }
 }

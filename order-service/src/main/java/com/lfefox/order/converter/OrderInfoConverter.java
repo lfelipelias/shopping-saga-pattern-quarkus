@@ -52,6 +52,27 @@ public class OrderInfoConverter {
     }
 
     /**
+     * Converts an entity to a resource
+     * @param entity to be converted
+     * @return resource
+     */
+    public static OrderInfoResource toSimpleResource(final OrderInfo entity) {
+        OrderInfoResource resource = null;
+
+        if (entity != null) {
+
+            resource = new OrderInfoResource();
+            resource.setOrderId(entity.getOrderId());
+            resource.setUserId(entity.getUserId());
+            resource.setStatus(entity.getStatus());
+            resource.setStatusId(entity.getStatusId());
+            resource.setCreateDate(entity.getCreateDate());
+            resource.setTotalOrder(entity.getTotalOrder());
+        }
+        return resource;
+    }
+
+    /**
      * Converts a List of resources to a Set of entities
      * @param resources
      * @return set of entities

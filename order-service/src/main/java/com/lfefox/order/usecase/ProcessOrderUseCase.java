@@ -1,8 +1,10 @@
 package com.lfefox.order.usecase;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lfefox.common.resource.OrderInfoResource;
 import com.lfefox.order.service.OrderService;
+import io.smallrye.mutiny.Uni;
 import io.smallrye.reactive.messaging.kafka.Record;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -27,26 +29,37 @@ public class ProcessOrderUseCase {
 
 
     @SneakyThrows
-    public OrderInfoResource processOrder(OrderInfoResource orderResource){
+    public Uni<OrderInfoResource> processOrder(OrderInfoResource orderResource){
         log.info("BEGIN USECASE PROCESS ORDER: {}", orderResource);
 
-        orderResource = orderService.processOrder(orderResource);
+        Uni<OrderInfoResource> result = orderService
+                .processOrder(orderResource)
+                .onItem().ifNotNull().invoke(localItem -> sendPaymentEvent(localItem));
+
+        log.info("END USECASE PROCESS ORDER");
+
+        return result;
+    }
+
+    private void sendPaymentEvent(OrderInfoResource orderResource){
 
         ObjectMapper objectMapper = new ObjectMapper();
-        final String jsonToSend = objectMapper.writeValueAsString(orderResource);
+        final String jsonToSend;
+        try {
+            jsonToSend = objectMapper.writeValueAsString(orderResource);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
         log.info("sendPaymentEvent for order: {}", orderResource);
 
         emitter.send(Record.of(orderResource.getOrderId(), jsonToSend))
-                .whenComplete((success, failure) -> {
-                    if (failure != null) {
-                        log.error("Error sending message to payment-service on channel {} error: {} ", "payment-out", failure.getMessage());
-                    } else {
-                        log.info("Message for payment-service sent successfully on channel: {}", "payment-out");
-                    }
-                });
-
-        log.info("END USECASE PROCESS ORDER");
-        return orderResource;
+            .whenComplete((success, failure) -> {
+                if (failure != null) {
+                    log.error("Error sending message to payment-service on channel {} error: {} ", "payment-out", failure.getMessage());
+                } else {
+                    log.info("Message for payment-service sent successfully on channel: {}", "payment-out");
+                }
+            });
     }
 }
