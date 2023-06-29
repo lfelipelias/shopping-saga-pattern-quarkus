@@ -2,6 +2,7 @@ package com.lfefox.payment.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lfefox.common.resource.OrderInfoResource;
+import io.smallrye.mutiny.Uni;
 import io.smallrye.reactive.messaging.kafka.Record;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -25,7 +26,7 @@ public class OrderEventProducer {
     Emitter<Record<Long, String>> emitter;
 
     @SneakyThrows
-    public void sendOrderEvent(OrderInfoResource orderResource) {
+    public Uni<Void> sendOrderEvent(OrderInfoResource orderResource) {
         log.info("sendOrderEvent: {}" , orderResource);
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -40,5 +41,6 @@ public class OrderEventProducer {
                         log.info("Message for payment-service sent successfully on channel: {}", "order-out");
                     }
                 });
+        return Uni.createFrom().voidItem();
     }
 }

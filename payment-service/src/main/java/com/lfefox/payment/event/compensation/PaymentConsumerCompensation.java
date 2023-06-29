@@ -3,6 +3,7 @@ package com.lfefox.payment.event.compensation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lfefox.common.resource.PaymentResource;
 import com.lfefox.payment.usecase.CancelPaymentUseCase;
+import io.smallrye.mutiny.Uni;
 import io.smallrye.reactive.messaging.kafka.Record;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.control.ActivateRequestContext;
 import javax.transaction.Transactional;
 
 /**
@@ -25,14 +27,14 @@ public class PaymentConsumerCompensation {
 
     @SneakyThrows
     @Incoming("product-in")
-    @Transactional
-    public void receive(Record<Long, String> record) {
+    @ActivateRequestContext
+    public Uni<Void> receive(Record<Long, String> record) {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
         PaymentResource paymentResource = objectMapper.readValue(record.value(), PaymentResource.class);
 
         log.info("receiving event for payment compensation: {}", paymentResource);
-        cancelPaymentUseCase.cancelPayment(paymentResource);
+        return cancelPaymentUseCase.cancelPayment(paymentResource);
     }
 }

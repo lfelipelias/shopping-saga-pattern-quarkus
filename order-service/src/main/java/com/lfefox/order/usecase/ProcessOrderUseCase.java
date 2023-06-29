@@ -34,14 +34,15 @@ public class ProcessOrderUseCase {
 
         Uni<OrderInfoResource> result = orderService
                 .processOrder(orderResource)
-                .onItem().ifNotNull().invoke(localItem -> sendPaymentEvent(localItem));
+                .onItem()
+                .ifNotNull().call(localItem -> sendPaymentEvent(localItem));
 
         log.info("END USECASE PROCESS ORDER");
 
         return result;
     }
 
-    private void sendPaymentEvent(OrderInfoResource orderResource){
+    private Uni<Void> sendPaymentEvent(OrderInfoResource orderResource){
 
         ObjectMapper objectMapper = new ObjectMapper();
         final String jsonToSend;
@@ -61,5 +62,7 @@ public class ProcessOrderUseCase {
                     log.info("Message for payment-service sent successfully on channel: {}", "payment-out");
                 }
             });
+
+        return Uni.createFrom().voidItem();
     }
 }

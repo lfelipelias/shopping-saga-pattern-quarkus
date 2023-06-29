@@ -20,7 +20,6 @@ import javax.inject.Inject;
  */
 @Slf4j
 @ApplicationScoped
-
 public class OrderEventConsumer {
     @Inject
     CancelOrderUseCase cancelOrderUseCase;

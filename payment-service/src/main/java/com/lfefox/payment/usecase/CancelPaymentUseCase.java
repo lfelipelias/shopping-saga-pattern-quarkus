@@ -6,6 +6,7 @@ import com.lfefox.common.resource.OrderInfoResource;
 import com.lfefox.common.resource.PaymentResource;
 import com.lfefox.payment.event.OrderEventProducer;
 import com.lfefox.payment.service.PaymentService;
+import io.smallrye.mutiny.Uni;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,22 +25,30 @@ public class CancelPaymentUseCase {
     private final OrderEventProducer orderEventProducer;
 
 
-    @Transactional
-    public void cancelPayment(PaymentResource paymentResource) {
+    public Uni<Void> cancelPayment(PaymentResource paymentResource) {
 
         log.info("BEGIN COMPENSATION FOR PAYMENT: {}", paymentResource);
 
-        paymentResource = paymentService.compensatePayment(paymentResource);
+        return paymentService
+                .compensatePayment(paymentResource)
+                .onItem()
+                .call(ex -> sendCompensationOrderEvent(paymentResource));
+    }
 
+    /**
+     * Sends the compensation for order service
+     * @param paymentResource
+     * @return
+     */
+    private Uni<Void> sendCompensationOrderEvent(PaymentResource paymentResource){
         final OrderInfoResource orderResource = new OrderInfoResource();
         orderResource.setOrderId(paymentResource.getOrderId());
-        orderResource.setStatus(OrderStatusEnum.ERROR_PAYMENT.name());
-        orderResource.setStatusId(OrderStatusEnum.ERROR_PAYMENT.getId());
+        orderResource.setStatus(paymentResource.getStatus());
+        orderResource.setStatusId(paymentResource.getStatusId());
         orderResource.setTransactionEventType(TransactionEventTypeEnum.COMPENSATION);
 
         log.info("SENDING COMPENSATE ORDER EVENT: {}", orderResource);
-        orderEventProducer.sendOrderEvent(orderResource);
+        return orderEventProducer.sendOrderEvent(orderResource);
 
-        log.info("END COMPENSATION FOR PAYMENT: {}", paymentResource);
     }
 }

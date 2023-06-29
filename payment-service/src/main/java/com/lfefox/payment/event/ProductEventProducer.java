@@ -6,6 +6,7 @@ import com.lfefox.common.enums.TransactionEventTypeEnum;
 import com.lfefox.common.resource.OrderInfoResource;
 import com.lfefox.common.resource.PaymentResource;
 import com.lfefox.payment.service.PaymentService;
+import io.smallrye.mutiny.Uni;
 import io.smallrye.reactive.messaging.kafka.Record;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -30,7 +31,7 @@ public class ProductEventProducer {
     private final PaymentService paymentService;
 
     @SneakyThrows
-    public void sendProductEvent(PaymentResource paymentResource) {
+    public Uni<Void> sendProductEvent(PaymentResource paymentResource) {
         log.info("sendPaymentEvent for payment: {}", paymentResource);
 
         final OrderInfoResource orderResource = new OrderInfoResource();
@@ -46,12 +47,11 @@ public class ProductEventProducer {
                         log.error("Error sending message to product-service on channel {} error: {} ", "payment-out", failure.getMessage());
 
 
-                        orderResource.setStatus(OrderStatusEnum.ERROR_PAYMENT.name());
-                        orderResource.setStatusId(OrderStatusEnum.ERROR_PAYMENT.getId());
-                        orderResource.setTransactionEventType(TransactionEventTypeEnum.COMPENSATION);
-
-                        orderEventProducer.sendOrderEvent(orderResource);
-                        paymentService.compensatePayment(paymentResource);
+                        orderEventProducer
+                                .sendOrderEvent(orderResource)
+                                .onItem()
+                                .call(i -> paymentService.compensatePayment(paymentResource))
+                                .replaceWithVoid();
 
                     } else {
 
@@ -60,5 +60,6 @@ public class ProductEventProducer {
                     }
                 });
 
+        return Uni.createFrom().voidItem();
     }
 }

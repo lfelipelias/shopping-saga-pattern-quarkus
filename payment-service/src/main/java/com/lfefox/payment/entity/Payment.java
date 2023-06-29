@@ -1,10 +1,11 @@
 package com.lfefox.payment.entity;
 
+
+import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import javax.persistence.*;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import java.util.Date;
 
 /**

@@ -62,9 +62,9 @@ public class OrderService {
             });
         }
         return Panache
-                .withTransaction(orderInfo::persist)
+                .withTransaction(orderInfo::persistAndFlush)
                 .onItem()
-                .transform(inserted -> OrderInfoConverter.toResource(orderInfo));
+                .transform(inserted -> OrderInfoConverter.toResource((OrderInfo) inserted));
     }
 
     public Uni<OrderInfoResource> updateOrder(OrderInfoResource orderResource){

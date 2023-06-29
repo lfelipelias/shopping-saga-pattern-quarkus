@@ -3,12 +3,14 @@ package com.lfefox.payment.event;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lfefox.common.resource.OrderInfoResource;
 import com.lfefox.payment.usecase.PaymentUseCase;
+import io.smallrye.mutiny.Uni;
 import io.smallrye.reactive.messaging.kafka.Record;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.control.ActivateRequestContext;
 import javax.transaction.Transactional;
 
 /**
@@ -23,10 +25,8 @@ public class PaymentEventConsumer {
 
     @SneakyThrows
     @Incoming("payment-in")
-    @Transactional
-    public void receive(Record<Long, String> record) {
-
-
+    @ActivateRequestContext
+    public Uni<Void> receive(Record<Long, String> record) {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -34,7 +34,7 @@ public class PaymentEventConsumer {
 
         log.info("receiving event of new order");
 
-        paymentUseCase.makePayment(orderResource);
+        return paymentUseCase.makePayment(orderResource);
 
     }
 }

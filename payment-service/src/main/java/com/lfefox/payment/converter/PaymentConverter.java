@@ -65,6 +65,7 @@ public class PaymentConverter {
         Payment entity =  null;
         if(resource != null){
             entity = new Payment();
+            entity.setPaymentId(resource.getPaymentId());
             entity.setCreateDate(Calendar.getInstance().getTime());
             entity.setOrderId(resource.getOrderId());
             entity.setStatus(resource.getStatus());

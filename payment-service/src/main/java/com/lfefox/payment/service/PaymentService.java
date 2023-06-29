@@ -4,6 +4,9 @@ import com.lfefox.common.enums.PaymentStatusEnum;
 import com.lfefox.common.resource.PaymentResource;
 import com.lfefox.payment.converter.PaymentConverter;
 import com.lfefox.payment.entity.Payment;
+import io.quarkus.hibernate.reactive.panache.Panache;
+import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
+import io.smallrye.mutiny.Uni;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import javax.enterprise.context.ApplicationScoped;
@@ -18,50 +21,61 @@ import java.util.Calendar;
 @RequiredArgsConstructor
 public class PaymentService {
 
-    @Transactional(Transactional.TxType.REQUIRES_NEW)
-    public PaymentResource savePayment(PaymentResource paymentResource){
+    /**
+     * Method responsible for saving payment in DB and simulate external call
+     * @param paymentResource
+     * @return
+     */
+    public Uni<PaymentResource> savePayment(PaymentResource paymentResource){
         log.info("savePayment: {}", paymentResource);
-        Payment payment = PaymentConverter.toEntity(paymentResource);
 
-
-        payment.persist();
-        return PaymentConverter.toResource(payment);
+        //we call .chain() so we can fetch the entity saved withTransaction(), without the chain() the update fails
+        return Panache
+                .withTransaction(PaymentConverter.toEntity(paymentResource)::persistAndFlush)
+                .chain(savedEntity ->
+                        makePaymentExternalCall((Payment) savedEntity, Boolean.FALSE)
+                            .onItem()
+                                .transform(item-> PaymentConverter.toResource(item))
+                );
     }
 
-    @Transactional(Transactional.TxType.REQUIRES_NEW)
-    public PaymentResource updatePayment(PaymentResource paymentResource){
-        log.info("updatePayment: {}", paymentResource);
-        Payment payment = Payment.findById(paymentResource.getPaymentId());
-
-        payment.setStatus(paymentResource.getStatus());
-        payment.setStatusId(paymentResource.getStatusId());
-
-        payment.persist();
-        return PaymentConverter.toResource(payment);
-    }
-
-    @Transactional(Transactional.TxType.REQUIRES_NEW)
-    public PaymentResource compensatePayment(PaymentResource paymentResource){
-        log.info("compensatePayment returning money and marking payment as compensated");
-
-        Payment payment = Payment.find("orderId", paymentResource.getOrderId()).firstResult();
-        payment.setStatus(PaymentStatusEnum.REFUND_DUE_COMPENSATION.name());
-        payment.setStatusId(PaymentStatusEnum.REFUND_DUE_COMPENSATION.getId());
-        payment.persist();
-
-        return PaymentConverter.toResource(payment);
-    }
     /**
      *
      * Simulating external call with success payment
      */
-    public void makePaymentExternalCall(PaymentResource paymentResource, Boolean fail) throws Exception {
+    public Uni<Payment> makePaymentExternalCall(Payment payment, Boolean fail)  {
 
         log.info("makePaymentExternalCall");
 
         if(fail == Boolean.TRUE){
-            throw new Exception("Simulating error payment external call");
+            //Updates status to ERROR_PROCESSING_PAYMENT then trow exception
+            payment.setStatus(PaymentStatusEnum.ERROR_PROCESSING_PAYMENT.name());
+            payment.setStatusId(PaymentStatusEnum.ERROR_PROCESSING_PAYMENT.getId());
+            return payment
+                    .persistAndFlush()
+                    .replaceWith(
+                            Uni.createFrom().failure(new Exception("Simulating error payment external call"))
+                    );
+        } else {
+            //Just UPDATE status to PAID
+            payment.setStatus(PaymentStatusEnum.PAID.name());
+            payment.setStatusId(PaymentStatusEnum.PAID.getId());
         }
-
+        return payment.persistAndFlush();
     }
+
+    public Uni<Void> compensatePayment(PaymentResource paymentResource){
+        log.info("compensatePayment returning money and marking payment as compensated");
+
+        return Panache
+                .withTransaction(() ->
+                    Payment.<Payment> find("orderId", paymentResource.getOrderId()).firstResult()
+                        .onItem().ifNotNull().invoke(entity -> {
+                            entity.setStatus(PaymentStatusEnum.REFUND_DUE_COMPENSATION.name());
+                            entity.setStatusId(PaymentStatusEnum.REFUND_DUE_COMPENSATION.getId());
+                        })
+                )
+                .replaceWithVoid();
+    }
+
 }
