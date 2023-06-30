@@ -28,39 +28,31 @@ public class ProductUseCase {
     @Transactional
     public void processProducts(OrderInfoResource orderResource){
 
-        log.info("BEGIN USECASE PROCESS PRODUCTS FOR ORDER: {}", orderResource);
-        //SENDING COMPENSATION TO ORDER SERVICE
-        PaymentResource paymentResource = new PaymentResource();
-        paymentResource.setOrderId(orderResource.getOrderId());
-        paymentResource.setStatus(OrderStatusEnum.ERROR_PRODUCT.name());
-        paymentResource.setStatusId(OrderStatusEnum.ERROR_PRODUCT.getId());
+        try{
+            productService.processOrder(orderResource);
+        } catch(Exception e){
 
-        paymentEventProducer.sendPaymentEvent(paymentResource);
-//        try{
-//            productService.processOrder(orderResource);
-//        } catch(Exception e){
-//
-//            productService.changeProductsToAvailable(orderResource);
-//
-//            //SAVING PAYMENT ERROR
-//            log.info("EXCEPTION DURING PROCESSING PRODUCTS, STARTING PAYMENT COMPENSATION");
-//
-//            //SENDING COMPENSATION TO ORDER SERVICE
-//            PaymentResource paymentResource = new PaymentResource();
-//            paymentResource.setOrderId(orderResource.getOrderId());
-//            paymentResource.setStatus(OrderStatusEnum.ERROR_PRODUCT.name());
-//            paymentResource.setStatusId(OrderStatusEnum.ERROR_PRODUCT.getId());
-//
-//            paymentEventProducer.sendPaymentEvent(paymentResource);
-//
-//            log.info("END USECASE NEW PAYMENT FOR ORDER: {}", orderResource);
-//            return;
-//        }
-//
-//
-//
-//        orderResource.setTransactionEventType(TransactionEventTypeEnum.COMPLETE_ORDER);
-//        orderEventProducer.sendOrderEvent(orderResource);
-//        log.info("END USECASE PROCESS PRODUCTS FOR ORDER: {}", orderResource);
+            productService.changeProductsToAvailable(orderResource);
+
+            //SAVING PAYMENT ERROR
+            log.info("EXCEPTION DURING PROCESSING PRODUCTS, STARTING PAYMENT COMPENSATION");
+
+            //SENDING COMPENSATION TO ORDER SERVICE
+            PaymentResource paymentResource = new PaymentResource();
+            paymentResource.setOrderId(orderResource.getOrderId());
+            paymentResource.setStatus(OrderStatusEnum.ERROR_PRODUCT.name());
+            paymentResource.setStatusId(OrderStatusEnum.ERROR_PRODUCT.getId());
+
+            paymentEventProducer.sendPaymentEvent(paymentResource);
+
+            log.info("END USECASE NEW PAYMENT FOR ORDER: {}", orderResource);
+            return;
+        }
+
+
+
+        orderResource.setTransactionEventType(TransactionEventTypeEnum.COMPLETE_ORDER);
+        orderEventProducer.sendOrderEvent(orderResource);
+        log.info("END USECASE PROCESS PRODUCTS FOR ORDER: {}", orderResource);
     }
 }

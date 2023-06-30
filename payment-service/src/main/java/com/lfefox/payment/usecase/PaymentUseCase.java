@@ -43,9 +43,8 @@ public class PaymentUseCase {
                         .ifNotNull()
                         .call(localItem -> productEventProducer.sendProductEvent(localItem))
                     .onFailure()
-                        .recoverWithNull()
                         .call(ex -> sendCompensationOrderEvent(orderResource))
-                    .replaceWithVoid();
+                        .replaceWithVoid();
     }
 
     /**

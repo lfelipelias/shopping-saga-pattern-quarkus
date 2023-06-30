@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.control.ActivateRequestContext;
-import javax.transaction.Transactional;
 
 /**
  * Felipe.Elias
@@ -34,7 +33,9 @@ public class PaymentEventConsumer {
 
         log.info("receiving event of new order");
 
-        return paymentUseCase.makePayment(orderResource);
+        return paymentUseCase
+                .makePayment(orderResource)
+                    .invoke(()-> log.info("END USECASE NEW PAYMENT FOR ORDER: {}", orderResource));
 
     }
 }

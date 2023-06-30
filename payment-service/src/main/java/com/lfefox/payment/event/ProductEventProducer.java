@@ -7,6 +7,7 @@ import com.lfefox.common.resource.OrderInfoResource;
 import com.lfefox.common.resource.PaymentResource;
 import com.lfefox.payment.service.PaymentService;
 import io.smallrye.mutiny.Uni;
+import io.smallrye.reactive.messaging.MutinyEmitter;
 import io.smallrye.reactive.messaging.kafka.Record;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -15,6 +16,7 @@ import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.control.ActivateRequestContext;
 
 /**
  * Felipe.Elias
@@ -25,14 +27,14 @@ import javax.enterprise.context.ApplicationScoped;
 public class ProductEventProducer {
 
     @Channel("product-out")
-    Emitter<Record<Long, String>> emitter;
+    MutinyEmitter<Record<Long, String>> emitter;
 
     private final OrderEventProducer orderEventProducer;
     private final PaymentService paymentService;
 
     @SneakyThrows
     public Uni<Void> sendProductEvent(PaymentResource paymentResource) {
-        log.info("sendPaymentEvent for payment: {}", paymentResource);
+        log.info("sendProductEvent for payment: {}", paymentResource);
 
         final OrderInfoResource orderResource = new OrderInfoResource();
         orderResource.setOrderId(paymentResource.getOrderId());
@@ -41,25 +43,22 @@ public class ProductEventProducer {
 
         var paymentJson = objectMapper.writeValueAsString(orderResource);
 
-        emitter.send(Record.of(paymentResource.getPaymentId(), paymentJson))
-                .whenComplete((success, failure) -> {
-                    if (failure != null) {
-                        log.error("Error sending message to product-service on channel {} error: {} ", "payment-out", failure.getMessage());
+        return emitter.send(Record.of(paymentResource.getPaymentId(), paymentJson))
+                .onItem()
+                    .invoke(() -> log.info("Message for product-service sent successfully on channel: {}", "payment-out"))
+                .onFailure()
+                    .call(()->{
+                        //FIRST WE COMPENSATE/UPDATE PAYMENT TABLE, THEN WE SEND COMPENSATION MESSAGE TO ORDER-SERVICE
 
+                        log.error("Error sending message to product-service on channel {} ", "payment-out");
+                        orderResource.setStatus(OrderStatusEnum.ERROR_PAYMENT.name());
+                        orderResource.setStatusId(OrderStatusEnum.ERROR_PAYMENT.getId());
+                        orderResource.setTransactionEventType(TransactionEventTypeEnum.COMPENSATION);
 
-                        orderEventProducer
-                                .sendOrderEvent(orderResource)
-                                .onItem()
-                                .call(i -> paymentService.compensatePayment(paymentResource))
-                                .replaceWithVoid();
-
-                    } else {
-
-                        log.info("Message for product-service sent successfully on channel: {}", "payment-out");
-
-                    }
-                });
-
-        return Uni.createFrom().voidItem();
+                        return paymentService
+                                .compensatePayment(paymentResource)
+                                    .onItem()
+                                        .call(() -> orderEventProducer.sendOrderEvent(orderResource));
+                    });
     }
 }
