@@ -7,10 +7,10 @@ import com.lfefox.common.resource.PaymentResource;
 import com.lfefox.product.event.OrderEventProducer;
 import com.lfefox.product.event.PaymentEventProducer;
 import com.lfefox.product.service.ProductService;
+import io.smallrye.mutiny.Uni;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import javax.enterprise.context.ApplicationScoped;
-import javax.transaction.Transactional;
 
 /**
  * Felipe.Elias
@@ -25,34 +25,34 @@ public class ProductUseCase {
 
     private final ProductService productService;
 
-    @Transactional
-    public void processProducts(OrderInfoResource orderResource){
+    public Uni<Void> processProducts(OrderInfoResource orderResource){
+        log.info("BEGIN USECASE NEW PRODUCT FOR ORDER: {}", orderResource);
+        return productService
+                .markProductsAsSold(orderResource)
+                    .onItem()
+                        .call(() -> sendOrderCompleteEvent(orderResource))
+                    .onFailure()
+                        .call(()->{
 
-        try{
-            productService.processOrder(orderResource);
-        } catch(Exception e){
+                            log.info("EXCEPTION DURING PROCESSING PRODUCTS, STARTING PAYMENT COMPENSATION");
 
-            productService.changeProductsToAvailable(orderResource);
+                            //SENDING COMPENSATION TO ORDER SERVICE
+                            PaymentResource paymentResource = new PaymentResource();
+                            paymentResource.setOrderId(orderResource.getOrderId());
+                            paymentResource.setStatus(OrderStatusEnum.ERROR_PRODUCT.name());
+                            paymentResource.setStatusId(OrderStatusEnum.ERROR_PRODUCT.getId());
 
-            //SAVING PAYMENT ERROR
-            log.info("EXCEPTION DURING PROCESSING PRODUCTS, STARTING PAYMENT COMPENSATION");
+                            return productService
+                                    .markProductsAsAvailable(orderResource)
+                                    .onItem()
+                                        .call(() -> paymentEventProducer.sendPaymentEvent(paymentResource));
+                        });
+    }
 
-            //SENDING COMPENSATION TO ORDER SERVICE
-            PaymentResource paymentResource = new PaymentResource();
-            paymentResource.setOrderId(orderResource.getOrderId());
-            paymentResource.setStatus(OrderStatusEnum.ERROR_PRODUCT.name());
-            paymentResource.setStatusId(OrderStatusEnum.ERROR_PRODUCT.getId());
+    private Uni<Void> sendOrderCompleteEvent(OrderInfoResource orderResource){
 
-            paymentEventProducer.sendPaymentEvent(paymentResource);
-
-            log.info("END USECASE NEW PAYMENT FOR ORDER: {}", orderResource);
-            return;
-        }
-
-
-
+        //SENDING COMPENSATION TO ORDER SERVICE
         orderResource.setTransactionEventType(TransactionEventTypeEnum.COMPLETE_ORDER);
-        orderEventProducer.sendOrderEvent(orderResource);
-        log.info("END USECASE PROCESS PRODUCTS FOR ORDER: {}", orderResource);
+        return orderEventProducer.sendOrderEvent(orderResource);
     }
 }

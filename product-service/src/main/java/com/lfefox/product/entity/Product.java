@@ -1,6 +1,7 @@
 package com.lfefox.product.entity;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+
+import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

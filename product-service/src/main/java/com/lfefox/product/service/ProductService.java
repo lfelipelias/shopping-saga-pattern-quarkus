@@ -3,16 +3,16 @@ package com.lfefox.product.service;
 
 import com.lfefox.common.enums.ProductStatusEnum;
 import com.lfefox.common.resource.OrderInfoResource;
-import com.lfefox.common.resource.ProductResource;
 import com.lfefox.product.entity.Product;
+import io.quarkus.hibernate.reactive.panache.Panache;
+import io.smallrye.mutiny.Uni;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.transaction.Transactional;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Felipe.Elias
@@ -22,96 +22,69 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductService {
 
-    @Transactional(Transactional.TxType.REQUIRES_NEW)
-    public void processOrder(OrderInfoResource orderResource){
-        log.info("processOrder: {}", orderResource);
-
-        List<Product> products = Product.find("orderId", orderResource.getOrderId()).list();
-
-        if(!ObjectUtils.isEmpty(products)){
-            products.forEach(prod ->{
-                prod.setStatusId(ProductStatusEnum.SOLD.getId());
-                prod.setStatus(ProductStatusEnum.SOLD.name());
-            });
-        }
-
-        Product.persist(products);
-
-        log.info("setting status of products to : {}", ProductStatusEnum.SOLD.name());
+    public Uni<Void> markProductsAsSold(OrderInfoResource orderResource){
+        log.info("markProductsAsSold: {}", orderResource);
+        return Panache
+            .withTransaction(() ->
+                Product.<Product> find("orderId", orderResource.getOrderId())
+                    .list()
+                    .onItem()
+                    .ifNotNull()
+                        .invoke(entities -> {
+                            log.info(String.format("Updating status of products of order %s to %s", orderResource.getOrderId(),ProductStatusEnum.SOLD.name()));
+                            if(!ObjectUtils.isEmpty(entities)){
+                                entities.stream().forEach(entity ->{
+                                    entity.setStatusId(ProductStatusEnum.SOLD.getId());
+                                    entity.setStatus(ProductStatusEnum.SOLD.name());
+                                });
+                            }
+                        })
+            ).replaceWithVoid();
 
     }
 
-    @Transactional(Transactional.TxType.REQUIRES_NEW)
-    public void changeProductsToSellInProgress(OrderInfoResource orderResource){
+    public Uni<Void> changeProductsToSellInProgress(OrderInfoResource orderResource){
         log.info("changeProductsToSellInProgress: {}", orderResource);
+        List<Long> ids = orderResource.getOrderProductResources().stream().map(obj -> obj.getProductId()).collect(Collectors.toList());
 
-
-        orderResource.getOrderProductResources().forEach(op ->{
-            Product product = Product.findById(op.getProductId());
-            if(product != null && product.getStatusId() == ProductStatusEnum.AVAILABLE.getId()){
-                product.setOrderId(orderResource.getOrderId());
-                product.setStatus(ProductStatusEnum.SELL_IN_PROGRESS.name());
-                product.setStatusId(ProductStatusEnum.SELL_IN_PROGRESS.getId());
-                product.persist();
-            } else {
-                throw new RuntimeException("PRODUCT STATUS IS NOT AVAILABLE");
-            }
-        });
-
-
-
-
-        log.info("setting status of products to : {}", ProductStatusEnum.AVAILABLE.name());
-
+        return Panache
+                .withTransaction(() ->
+                        Product
+                            .list("prodId in ?1", ids)
+                                .onItem()
+                                .ifNotNull()
+                                .invoke(entities -> {
+                                    log.info(String.format("Updating status of products of order ID %s to %s", orderResource.getOrderId(),ProductStatusEnum.SOLD.name()));
+                                    if(!ObjectUtils.isEmpty(entities)){
+                                        entities.stream().forEach(entity -> {
+                                            ((Product)entity).setOrderId(orderResource.getOrderId());
+                                            ((Product)entity).setStatus(ProductStatusEnum.SELL_IN_PROGRESS.name());
+                                            ((Product)entity).setStatusId(ProductStatusEnum.SELL_IN_PROGRESS.getId());
+                                        });
+                                    }
+                                })
+                ).replaceWithVoid();
     }
 
-    @Transactional(Transactional.TxType.REQUIRES_NEW)
-    public void changeProductsToAvailable(OrderInfoResource orderResource){
-        log.info("changeProductsToAvailable: {}", orderResource);
+    public Uni<Void> markProductsAsAvailable(OrderInfoResource orderResource){
+        log.info("markProductsAsAvailable: {}", orderResource);
 
-        List<Product> products = Product.find("orderId", orderResource.getOrderId()).list();
-
-        if(!ObjectUtils.isEmpty(products)){
-            products.forEach(prod ->{
-                prod.setStatusId(ProductStatusEnum.AVAILABLE.getId());
-                prod.setStatus(ProductStatusEnum.AVAILABLE.name());
-                prod.setOrderId(null);
-            });
-        }
-
-        Product.persist(products);
-
-        log.info("setting status of products to : {}", ProductStatusEnum.AVAILABLE.name());
-
-    }
-
-    @Transactional
-    public List<ProductResource> listProducts(OrderInfoResource orderResource){
-        log.info("listingProducts for orderId: {} with productStatus: {} ", orderResource.getOrderId(), ProductStatusEnum.SELL_IN_PROGRESS.name());
-
-        ProductResource productOne = new ProductResource();
-        productOne.setOrderId(1L);
-        productOne.setProductId(1L);
-        productOne.setStatus(ProductStatusEnum.SELL_IN_PROGRESS.name());
-        productOne.setStatusId(ProductStatusEnum.SELL_IN_PROGRESS.getId());
-        productOne.setName("GAMER MONITOR");
-
-        ProductResource productTwo = new ProductResource();
-        productTwo.setOrderId(1L);
-        productTwo.setProductId(2L);
-        productTwo.setStatus(ProductStatusEnum.SELL_IN_PROGRESS.name());
-        productTwo.setStatusId(ProductStatusEnum.SELL_IN_PROGRESS.getId());
-        productTwo.setName("SSD HD");
-
-
-        return Arrays.asList(productOne, productTwo);
+        return Panache
+            .withTransaction(() ->
+                Product.<Product> find("orderId", orderResource.getOrderId())
+                    .list()
+                    .onItem()
+                    .ifNotNull()
+                        .invoke(entities -> {
+                            log.info(String.format("Updating status of products of order %s to %s", orderResource.getOrderId(),ProductStatusEnum.AVAILABLE.name()));
+                            if(!ObjectUtils.isEmpty(entities)){
+                                entities.stream().forEach(entity ->{
+                                    entity.setStatusId(ProductStatusEnum.AVAILABLE.getId());
+                                    entity.setStatus(ProductStatusEnum.AVAILABLE.name());
+                                });
+                            }
+                        })
+            ).replaceWithVoid();
 
     }
-    @Transactional
-    public void saveProducts(List<ProductResource> productResources){
-        log.info("saving products: {}", productResources);
-
-    }
-
-
 }

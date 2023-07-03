@@ -2,15 +2,14 @@ package com.lfefox.product.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lfefox.common.resource.OrderInfoResource;
+import io.smallrye.mutiny.Uni;
+import io.smallrye.reactive.messaging.MutinyEmitter;
 import io.smallrye.reactive.messaging.kafka.Record;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.reactive.messaging.Channel;
-import org.eclipse.microprofile.reactive.messaging.Emitter;
-
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 /**
  * Felipe.Elias
@@ -20,25 +19,21 @@ import javax.inject.Inject;
 @RequiredArgsConstructor
 public class OrderEventProducer {
 
-    @Inject
     @Channel("order-out")
-    Emitter<Record<Long, String>> emitter;
+    MutinyEmitter<Record<Long, String>> emitter;
 
     @SneakyThrows
-    public void sendOrderEvent(OrderInfoResource orderResource) {
+    public Uni<Void> sendOrderEvent(OrderInfoResource orderResource) {
         log.info("sendOrderEvent: {}" , orderResource);
 
         ObjectMapper objectMapper = new ObjectMapper();
 
         final String jsonToSend = objectMapper.writeValueAsString(orderResource);
 
-        emitter.send(Record.of(orderResource.getOrderId(), jsonToSend))
-                .whenComplete((success, failure) -> {
-                    if (failure != null) {
-                        log.error("Error sending message to order-service on channel {} error: {} ", "order-out", failure.getMessage());
-                    } else {
-                        log.info("Message for payment-service sent successfully on channel: {}", "order-out");
-                    }
-                });
+        return emitter.send(Record.of(orderResource.getOrderId(), jsonToSend))
+                .onItem()
+                    .invoke(() -> log.info("Message for order-service sent successfully on channel: {}", "order-out"))
+                .onFailure()
+                    .invoke(failure -> log.error("Error sending message to order-service on channel {} error: {} ", "order-out", failure.getMessage()));
     }
 }

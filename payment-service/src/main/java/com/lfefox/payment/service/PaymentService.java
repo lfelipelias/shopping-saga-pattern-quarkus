@@ -5,13 +5,10 @@ import com.lfefox.common.resource.PaymentResource;
 import com.lfefox.payment.converter.PaymentConverter;
 import com.lfefox.payment.entity.Payment;
 import io.quarkus.hibernate.reactive.panache.Panache;
-import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.smallrye.mutiny.Uni;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import javax.enterprise.context.ApplicationScoped;
-import javax.transaction.Transactional;
-import java.util.Calendar;
 
 /**
  * Felipe.Elias
@@ -74,8 +71,7 @@ public class PaymentService {
                             entity.setStatus(PaymentStatusEnum.REFUND_DUE_COMPENSATION.name());
                             entity.setStatusId(PaymentStatusEnum.REFUND_DUE_COMPENSATION.getId());
                         })
-                )
-                .replaceWithVoid();
+                ).replaceWithVoid();
     }
 
 }
